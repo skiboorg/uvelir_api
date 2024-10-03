@@ -1,0 +1,7 @@
+.gridx2 {
+    padding: 10px;
+    border: 1px solid #cecece;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
+}

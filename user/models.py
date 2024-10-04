@@ -45,7 +45,7 @@ class User(AbstractUser):
     email = models.CharField('Почта', max_length=255, blank=True, null=True)
     fio = models.CharField('ФИО', max_length=255, blank=True, null=True)
     phone = models.CharField('Телефон', max_length=255, blank=True, null=True, unique=True)
-
+    is_opt_user = models.BooleanField('Оптовый', default=False)
 
     USERNAME_FIELD = 'phone'
     REQUIRED_FIELDS = []

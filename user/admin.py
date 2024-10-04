@@ -9,6 +9,7 @@ class UserAdmin(BaseUserAdmin):
         'email',
         'fio',
         'phone',
+        'is_opt_user',
         'date_joined',
 
     )
@@ -20,6 +21,7 @@ class UserAdmin(BaseUserAdmin):
             'fields': (
                 "fio",
                 "email",
+                'is_opt_user',
                        'password1',
                        'password2',
                        ), }),)
@@ -33,7 +35,7 @@ class UserAdmin(BaseUserAdmin):
 
                 "fio",
                 "phone",
-
+                'is_opt_user'
 
          )}
          ),

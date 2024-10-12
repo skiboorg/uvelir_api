@@ -34,7 +34,10 @@ class Payment(models.Model):
 
 class Order(models.Model):
     order_id = models.CharField('Номер заказа', max_length=255, blank=True, null=True)
-    customer = models.ForeignKey('user.User',on_delete=models.CASCADE,blank=False, null=True,verbose_name='Юзер', related_name='orders')
+    user = models.ForeignKey('user.User',on_delete=models.CASCADE,blank=True, null=True,verbose_name='Юзер', related_name='orders')
+    email = models.CharField('Почта', max_length=255, blank=True, null=True)
+    fio = models.CharField('ФИО', max_length=255, blank=True, null=True)
+    phone = models.CharField('Телефон', max_length=255, blank=True, null=True)
     payment_type = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True,verbose_name='Оплата')
     delivery_type = models.ForeignKey(Delivery, on_delete=models.SET_NULL, blank=True, null=True,verbose_name='Доставка')
     delivery_address = models.TextField('адрес доставки', blank=True, null=True)
@@ -42,6 +45,7 @@ class Order(models.Model):
     is_paid = models.BooleanField('Оплачен', default=False, null=False)
     is_done = models.BooleanField('Обработан', default=False, null=False)
     is_deliveried = models.BooleanField('Доставлен', default=False, null=False)
+    comment = models.TextField('Коментарий', blank=True, null=True)
 
     def __str__(self):
         return f'{self.order_id}'
@@ -57,5 +61,7 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True, null=True, related_name='items')
     product = models.ForeignKey('shop.Product', on_delete=models.CASCADE, blank=True, null=True)
+    size = models.ForeignKey('shop.Size', on_delete=models.CASCADE, blank=True, null=True)
     amount = models.IntegerField(default=0, blank=True, null=True)
+    price = models.DecimalField('Цена', decimal_places=2, max_digits=8, blank=True, null=True)
 

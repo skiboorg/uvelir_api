@@ -49,9 +49,9 @@ class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = tuple(User.REQUIRED_FIELDS) + (
-            'fio',
+            "fio",
+            "phone",
             'email',
-            'phone',
             'password',
         )
 

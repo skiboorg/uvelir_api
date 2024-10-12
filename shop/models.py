@@ -7,6 +7,8 @@ from django_resized import ResizedImageField
 class Category(models.Model):
     order_num = models.IntegerField(default=1, null=True)
     uid = models.CharField(max_length=255, blank=False, null=False)
+    icon = ResizedImageField(size=[20, 20], quality=95, force_format='WEBP', upload_to='shop/category/icon',
+                             blank=True, null=True)
     image = ResizedImageField(size=[420, 420], quality=95, force_format='WEBP', upload_to='shop/category/images',
                               blank=True, null=True)
     name = models.CharField('Название', max_length=255, blank=False, null=False)
@@ -60,39 +62,39 @@ class SubCategory(models.Model):
 
 class Fineness(models.Model):
     uid = models.CharField(max_length=255, blank=False, null=False)
-    name = models.CharField('Название', max_length=255, blank=False, null=False)
-    slug = models.CharField('ЧПУ', max_length=255, blank=True, null=True)
+    label = models.CharField('Название', max_length=255, blank=False, null=False)
+    value = models.CharField('ЧПУ', max_length=255, blank=True, null=True)
     def save(self, *args, **kwargs):
 
-        self.slug = slugify(self.name)
+        self.value = slugify(self.label)
         super().save(*args, **kwargs)
 
     class Meta:
 
-        verbose_name = 'Материал'
-        verbose_name_plural = 'Материалы'
+        verbose_name = 'Вставка'
+        verbose_name_plural = 'Вставки'
 
 
 class Coating(models.Model):
     uid = models.CharField(max_length=255, blank=False, null=False)
-    name = models.CharField('Название', max_length=255, blank=False, null=False)
-    slug = models.CharField('ЧПУ', max_length=255, blank=True, null=True)
+    label = models.CharField('Название', max_length=255, blank=False, null=False)
+    value = models.CharField('ЧПУ', max_length=255, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        self.value = slugify(self.label)
         super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name = 'Вставка'
-        verbose_name_plural = 'Вставки'
+        verbose_name = 'Покрытие'
+        verbose_name_plural = 'Покрытия'
 
 
 class Product(models.Model):
     uid = models.CharField(max_length=255, blank=False, null=False)
     article = models.CharField('Артикул',max_length=20,blank=True, null=True)
     subcategory = models.ForeignKey(SubCategory,blank=True,null=True,on_delete=models.CASCADE, related_name='products')
-    coating = models.ForeignKey(Coating,blank=True,null=True,on_delete=models.CASCADE)
-    fineness = models.ForeignKey(Fineness,blank=True,null=True,on_delete=models.CASCADE)
+    coating = models.ForeignKey(Coating,blank=True,null=True,on_delete=models.CASCADE, related_name='Покрытие')
+    fineness = models.ForeignKey(Fineness,blank=True,null=True,on_delete=models.CASCADE, related_name='Вставка')
     is_new = models.BooleanField('Новинка', default=False, null=False)
     is_popular = models.BooleanField('Популярный', default=False, null=False)
     is_active = models.BooleanField('Отображать?', default=True, null=False)

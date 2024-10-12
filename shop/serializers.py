@@ -96,10 +96,18 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
+class SubCategoryNoProductsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SubCategory
+        fields = ['id','name','slug']
+
+
 class CategoryShortSerializer(serializers.ModelSerializer):
+    sub_categories = SubCategoryNoProductsSerializer(many=True, required=False, read_only=True)
     class Meta:
         model = Category
-        fields = ['id','name','slug','image']
+        fields = ['sub_categories','id','name','slug','image','icon','items_count']
 
 class SubCategoryShortSerializer(serializers.ModelSerializer):
     #products = ProductShortSerializer(many=True, required=False, read_only=True)

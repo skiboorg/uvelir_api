@@ -42,12 +42,15 @@ class User(AbstractUser):
     username = None
     firstname = None
     lastname = None
-    email = models.CharField('Почта', max_length=255, blank=True, null=True)
+    email = models.CharField('Почта', max_length=255, blank=True, null=True, unique=True)
     fio = models.CharField('ФИО', max_length=255, blank=True, null=True)
-    phone = models.CharField('Телефон', max_length=255, blank=True, null=True, unique=True)
+    id_1c = models.CharField('1C ID', max_length=255, blank=True, null=True)
+    phone = models.CharField('Телефон', max_length=255, blank=True, null=True)
+    city = models.CharField('Город', max_length=255, blank=True, null=True)
+    comment = models.TextField('Коментарий', blank=True, null=True)
     is_opt_user = models.BooleanField('Оптовый', default=False)
 
-    USERNAME_FIELD = 'phone'
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = UserManager()
 

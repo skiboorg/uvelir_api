@@ -25,27 +25,31 @@ class OrderView(APIView):
 
     def post(self, request):
         data = request.data
+        print(data)
         cart = get_cart(request)
+        if request.user.is_authenticated:
+            user = request.user
+        else:
+            user = None
         new_order = Order.objects.create(
-            customer=data['customer'],
+            user=user,
+            fio=data['fio'],
             phone=data['phone'],
             email=data['email'],
             comment=data['comment'],
             payment_type_id=data['payment_type'],
             delivery_type_id=data['delivery_type'],
-            delivery_address=data['delivery_address']
         )
         for item in cart.items.all():
             OrderItem.objects.create(
                 order=new_order,
-                article=item.product.article,
-                name=item.product.name,
-                unit=item.unit.value,
-                price=item.unit.price,
-                amount=item.amount
+                product=item.product,
+                size=item.size,
+                amount=item.amount,
+                price=item.size.price
             )
             item.delete()
-        result = {'result': True, 'message': f'Заказ {new_order.id} создан'}
+        result = {'success': True, 'message': f'Заказ {new_order.id} создан'}
         return Response(result, status=200)
 
 

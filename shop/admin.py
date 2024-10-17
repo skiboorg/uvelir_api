@@ -8,10 +8,11 @@ class SizeInline(NestedStackedInline):
     extra = 0
 
 class ProductAdmin(NestedModelAdmin):
-    list_display = ('image_preview','article','name','subcategory','is_new','is_popular','is_active',)
+    list_display = ('image_preview','article','name','subcategory','filter','is_new','is_popular','is_active',)
     model = Product
     inlines = [SizeInline]
     readonly_fields = ['image_preview']
+    list_filter = ['is_popular','is_active']
 
     def image_preview(self, obj):
 
@@ -56,3 +57,5 @@ admin.site.register(Fineness)
 admin.site.register(Coating)
 admin.site.register(SubCategory,SubCategoryAdmin)
 admin.site.register(Product, ProductAdmin)
+admin.site.register(SubCategoryFilter)
+admin.site.register(Material)

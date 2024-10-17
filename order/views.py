@@ -43,8 +43,10 @@ class OrderView(APIView):
         for item in cart.items.all():
             OrderItem.objects.create(
                 order=new_order,
-                product=item.product,
-                size=item.size,
+                article=item.product.article,
+                image=item.product.image,
+                name=item.product.name,
+                avg_weight=item.size.avg_weight,
                 amount=item.amount,
                 price=item.size.price
             )

@@ -41,7 +41,7 @@ class Order(models.Model):
     payment_type = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True,verbose_name='Оплата')
     delivery_type = models.ForeignKey(Delivery, on_delete=models.SET_NULL, blank=True, null=True,verbose_name='Доставка')
     delivery_address = models.TextField('адрес доставки', blank=True, null=True)
-    created_at = models.DateField('Создан',blank=True, null=True)
+    created_at = models.DateField('Создан',auto_now_add=True, null=True)
     is_paid = models.BooleanField('Оплачен', default=False, null=False)
     is_done = models.BooleanField('Обработан', default=False, null=False)
     is_deliveried = models.BooleanField('Доставлен', default=False, null=False)
@@ -50,6 +50,13 @@ class Order(models.Model):
     def __str__(self):
         return f'{self.order_id}'
 
+    @property
+    def total_price(self):
+        result = Decimal(0)
+        for item in self.items.all():
+            result += item.price
+        print(result)
+        return result
     class Meta:
 
         verbose_name = 'Заказ'
@@ -60,8 +67,10 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True, null=True, related_name='items')
-    product = models.ForeignKey('shop.Product', on_delete=models.CASCADE, blank=True, null=True)
-    size = models.ForeignKey('shop.Size', on_delete=models.CASCADE, blank=True, null=True)
+    article = models.CharField('Артикул', max_length=20, blank=True, null=True)
+    image = models.FileField(upload_to='order/images', blank=False, null=True)
+    name = models.CharField('Название', max_length=255, blank=False, null=True)
+    avg_weight = models.DecimalField('Средний вес', decimal_places=4, max_digits=8, blank=True, null=True)
     amount = models.IntegerField(default=0, blank=True, null=True)
     price = models.DecimalField('Цена', decimal_places=2, max_digits=8, blank=True, null=True)
 

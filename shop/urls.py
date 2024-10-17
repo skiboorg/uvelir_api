@@ -5,6 +5,7 @@ urlpatterns = [
     path('categories', views.GetCategories.as_view()),
     path('coatings', views.GetCoatings.as_view()),
     path('finenesses', views.GetFinenesses.as_view()),
+    path('materials', views.GetMaterials.as_view()),
 
     path('categories/<slug>', views.GetCategory.as_view()),
     path('subcategory/<subcategory_slug>', views.GetSubCategory.as_view()),

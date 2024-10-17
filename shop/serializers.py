@@ -12,9 +12,19 @@ class FinenessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Fineness
         fields = '__all__'
+
+class MaterialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Material
+        fields = '__all__'
 class SizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Size
+        fields = '__all__'
+
+class SubCategoryFilterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubCategoryFilter
         fields = '__all__'
 
 
@@ -22,6 +32,7 @@ class ProductSerializer(serializers.ModelSerializer):
     sizes = SizeSerializer(many=True,required=False,read_only=True)
     coating = CoatingSerializer(many=False,required=False,read_only=True)
     fineness = FinenessSerializer(many=False,required=False,read_only=True)
+    material = MaterialSerializer(many=False,required=False,read_only=True)
     cat_slug = serializers.SerializerMethodField()
     cat_name = serializers.SerializerMethodField()
     subcat_slug = serializers.SerializerMethodField()

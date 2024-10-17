@@ -2,7 +2,8 @@ from django.db import models
 from pytils.translit import slugify
 from django_ckeditor_5.fields import CKEditor5Field
 from django_resized import ResizedImageField
-
+from random import choices
+import string
 
 class Category(models.Model):
     order_num = models.IntegerField(default=1, null=True)
@@ -32,11 +33,26 @@ class Category(models.Model):
 class SizeFilter(models.Model):
     product = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=False,
                                 related_name='size_filters')
-    size = models.DecimalField('Размер', decimal_places=2, max_digits=8, blank=True, null=True)
+    size = models.DecimalField('Размер', default=0, decimal_places=2, max_digits=5, blank=True, null=True)
+
+class SubCategoryFilter(models.Model):
+    uid = models.CharField(max_length=255, blank=False, null=False)
+    name = models.CharField('Название', max_length=255, blank=False, null=False)
+    slug = models.CharField('ЧПУ', max_length=255, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.name}'
+
 
 class SubCategory(models.Model):
     order_num = models.IntegerField(default=1, null=True)
     uid = models.CharField(max_length=255, blank=False, null=False)
+    filters = models.ManyToManyField(SubCategoryFilter, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=False, null=True, related_name='sub_categories')
     name = models.CharField('Название', max_length=255, blank=False, null=False)
     slug = models.CharField('ЧПУ', max_length=255,blank=True, null=True)
@@ -59,6 +75,25 @@ class SubCategory(models.Model):
         verbose_name = 'Подкатегория'
         verbose_name_plural = 'Подкатегории'
 
+class Material(models.Model):
+    uid = models.CharField(max_length=255, blank=False, null=False)
+    label = models.CharField('Название', max_length=255, blank=False, null=False)
+    value = models.CharField('ЧПУ', max_length=255, blank=True, null=True)
+    metal = models.CharField('Метал', max_length=255, blank=True, null=True)
+    probe = models.CharField('Проба', max_length=255, blank=True, null=True)
+    def save(self, *args, **kwargs):
+
+        self.value = slugify(self.label)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.label}'
+
+    class Meta:
+
+        verbose_name = 'Материал'
+        verbose_name_plural = 'Материалы'
+
 
 class Fineness(models.Model):
     uid = models.CharField(max_length=255, blank=False, null=False)
@@ -68,7 +103,8 @@ class Fineness(models.Model):
 
         self.value = slugify(self.label)
         super().save(*args, **kwargs)
-
+    def __str__(self):
+        return f'{self.label}'
     class Meta:
 
         verbose_name = 'Вставка'
@@ -83,7 +119,8 @@ class Coating(models.Model):
     def save(self, *args, **kwargs):
         self.value = slugify(self.label)
         super().save(*args, **kwargs)
-
+    def __str__(self):
+        return f'{self.label}'
     class Meta:
         verbose_name = 'Покрытие'
         verbose_name_plural = 'Покрытия'
@@ -95,12 +132,14 @@ class Product(models.Model):
     subcategory = models.ForeignKey(SubCategory,blank=True,null=True,on_delete=models.CASCADE, related_name='products')
     coating = models.ForeignKey(Coating,blank=True,null=True,on_delete=models.CASCADE, related_name='Покрытие')
     fineness = models.ForeignKey(Fineness,blank=True,null=True,on_delete=models.CASCADE, related_name='Вставка')
+    material = models.ForeignKey(Material,blank=True,null=True,on_delete=models.CASCADE, related_name='Материал')
+    filter = models.ForeignKey(SubCategoryFilter,blank=True,null=True,on_delete=models.CASCADE, related_name='Фильтр')
     is_new = models.BooleanField('Новинка', default=False, null=False)
     is_popular = models.BooleanField('Популярный', default=False, null=False)
     is_active = models.BooleanField('Отображать?', default=True, null=False)
     is_in_stock = models.BooleanField('В наличии?', default=True, null=False)
     image = ResizedImageField(size=[800, 600], quality=95, force_format='WEBP', upload_to='shop/product/images',
-                              blank=False, null=True)
+                              blank=True, null=True)
 
     name = models.CharField('Название', max_length=255, blank=False, null=True)
     slug = models.CharField('ЧПУ',max_length=255,
@@ -118,7 +157,8 @@ class Product(models.Model):
         verbose_name_plural = 'Товары'
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+
+        self.slug = f'{slugify(self.name)}-{''.join(choices(string.ascii_lowercase + string.digits, k=8))}'
         super().save(*args, **kwargs)
 
 
@@ -127,10 +167,11 @@ class Size(models.Model):
     uid = models.CharField(max_length=255, blank=False, null=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=False,
                                 related_name='sizes')
-    size = models.DecimalField('Размер', decimal_places=2, max_digits=8, blank=True, null=True)
+    size = models.DecimalField('Размер', default=0, decimal_places=2, max_digits=5, blank=True, null=True)
     quantity = models.IntegerField('Остаток', blank=True, null=True)
-    price = models.DecimalField('Цена', decimal_places=2, max_digits=8, blank=True, null=True)
-    price_opt = models.DecimalField('Цена оптовая', decimal_places=2, max_digits=8, blank=True, null=True)
+    price = models.DecimalField('Цена', default=0, decimal_places=2, max_digits=7, blank=True, null=True)
+    price_opt = models.DecimalField('Цена оптовая', default=0, decimal_places=2, max_digits=7, blank=True, null=True)
+
     min_weight = models.DecimalField('Минимальный вес', decimal_places=4, max_digits=8, blank=True, null=True)
     max_weight = models.DecimalField('Максимальный вес', decimal_places=4, max_digits=8, blank=True, null=True)
     avg_weight = models.DecimalField('Средний вес', decimal_places=4, max_digits=8, blank=True, null=True)

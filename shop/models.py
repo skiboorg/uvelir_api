@@ -158,7 +158,7 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
 
-        self.slug = f'{slugify(self.name)}-{''.join(choices(string.ascii_lowercase + string.digits, k=8))}'
+        self.slug = f'{slugify(self.name)}-{"".join(choices(string.ascii_lowercase + string.digits, k=8))}'
         super().save(*args, **kwargs)
 
 

@@ -1,5 +1,5 @@
 from rest_framework import exceptions, serializers, status, generics
-
+from django.db.models import Min, Avg
 
 from .models import *
 
@@ -55,8 +55,11 @@ class ProductShortSerializer(serializers.ModelSerializer):
     subcat_slug = serializers.SerializerMethodField()
     subcat_name = serializers.SerializerMethodField()
     subcat_text = serializers.SerializerMethodField()
+    min_price = serializers.SerializerMethodField()
+    avg_weight = serializers.SerializerMethodField()
     coating = CoatingSerializer(many=False, required=False, read_only=True)
     fineness = FinenessSerializer(many=False, required=False, read_only=True)
+    material = MaterialSerializer(many=False, required=False, read_only=True)
     class Meta:
         model = Product
         fields = ['name',
@@ -72,8 +75,18 @@ class ProductShortSerializer(serializers.ModelSerializer):
                   'is_active',
                   'is_in_stock',
                   'coating',
-                  'fineness'
+                  'fineness',
+                  'material',
+                  'min_price',
+                  'avg_weight',
                   ]
+    def get_min_price(self, obj):
+        # Получаем минимальное значение price из связанных объектов Size
+        return obj.sizes.aggregate(min_price=Min('price'))['min_price']
+
+    def get_avg_weight(self, obj):
+        # Получаем среднее значение avg_weight из связанных объектов Size
+        return obj.sizes.aggregate(avg_weight=Avg('avg_weight'))['avg_weight']
     def get_cat_slug(self,obj):
         return obj.subcategory.category.slug
     def get_subcat_slug(self,obj):
@@ -102,7 +115,13 @@ class SizeFilterSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     size_filters = SizeFilterSerializer(many=True, required=False, read_only=True)
-    sub_categories = SubCategorySerializer(many=True, required=False, read_only=True)
+    #sub_categories = SubCategorySerializer(many=True, required=False, read_only=True)
+    sub_categories = serializers.SerializerMethodField()
+    coatings = CoatingSerializer(many=True, required=False, read_only=True)
+    materials = MaterialSerializer(many=True, required=False, read_only=True)
+    def get_sub_categories(self,obj):
+        qs = SubCategory.objects.filter(category=obj, is_active=True)
+        return SubCategoryNoProductsSerializer(qs, many=True).data
     class Meta:
         model = Category
         fields = '__all__'
@@ -115,10 +134,17 @@ class SubCategoryNoProductsSerializer(serializers.ModelSerializer):
 
 
 class CategoryShortSerializer(serializers.ModelSerializer):
-    sub_categories = SubCategoryNoProductsSerializer(many=True, required=False, read_only=True)
+    #sub_categories = SubCategoryNoProductsSerializer(many=True, required=False, read_only=True)
+    sub_categories = serializers.SerializerMethodField()
+
+    def get_sub_categories(self,obj):
+        qs = SubCategory.objects.filter(category=obj, is_active=True)
+        return SubCategoryNoProductsSerializer(qs, many=True).data
     class Meta:
         model = Category
         fields = ['sub_categories','id','name','slug','image','icon','items_count']
+
+
 
 class SubCategoryShortSerializer(serializers.ModelSerializer):
     #products = ProductShortSerializer(many=True, required=False, read_only=True)

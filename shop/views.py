@@ -14,7 +14,7 @@ import json
 
 class GetCategories(generics.ListAPIView):
     serializer_class = CategoryShortSerializer
-    queryset = Category.objects.all()
+    queryset = Category.objects.filter(is_active=True)
 
 
 class GetCoatings(generics.ListAPIView):
@@ -29,6 +29,7 @@ class GetMaterials(generics.ListAPIView):
     serializer_class = MaterialSerializer
     queryset = Material.objects.all()
 
+
 class GetCategory(generics.RetrieveAPIView):
     serializer_class = CategorySerializer
     queryset = Category.objects.filter()
@@ -36,7 +37,7 @@ class GetCategory(generics.RetrieveAPIView):
 
 
 class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 10  # Количество элементов на странице
+    page_size = 21  # Количество элементов на странице
     page_size_query_param = 'page_size'
     max_page_size = 100
 
@@ -138,7 +139,14 @@ class GetProduct(generics.RetrieveAPIView):
 
 class GetPopularProducts(generics.ListAPIView):
     serializer_class = ProductShortSerializer
-    queryset = Product.objects.filter(is_popular=True, is_active=True)
+    #queryset = Product.objects.filter(is_popular=True, is_active=True)
+
+    def get_queryset(self):
+        products = []
+        all_uuids = Popular.objects.all()
+        for uuid in all_uuids:
+            products.append(Product.objects.get(uid=uuid))
+        return products
 
 
 class GetNewProducts(generics.ListAPIView):
@@ -147,12 +155,12 @@ class GetNewProducts(generics.ListAPIView):
 
 class Test1(APIView):
     def get(self, request):
-        Category.objects.all().delete()
-        SizeFilter.objects.all().delete()
-        Material.objects.all().delete()
-        Coating.objects.all().delete()
-        Fineness.objects.all().delete()
-        SubCategory.objects.all().delete()
+        # Category.objects.all().delete()
+        # SizeFilter.objects.all().delete()
+        # Material.objects.all().delete()
+        # Coating.objects.all().delete()
+        # Fineness.objects.all().delete()
+        # SubCategory.objects.all().delete()
         Product.objects.all().delete()
 
         with open('test.json', 'r', encoding='utf-8') as file:
@@ -254,7 +262,7 @@ class Test1(APIView):
                         cat = subcategory_obj.category
                         SizeFilter.objects.get_or_create(
                             product=cat,
-                            size=Decimal(size.get('Size',0).replace(',','.'))
+                            size=size.get('Size')
                         )
                     price_key = size.get('RetailPrice')
                     if price_key == '':
@@ -263,15 +271,34 @@ class Test1(APIView):
                         new_product.save()
                     else:
                         price = Decimal(price_key.replace(',','.'))
-                    Size.objects.create(
-                        product=new_product,
-                        size=Decimal(size.get('Size',0).replace(',','.')),
-                        quantity=int(size.get('Quantity',0)),
-                        price=price,
-                        min_weight=Decimal(size.get('WeightMin')),
-                        max_weight=Decimal(size.get('WeightMax')),
-                        avg_weight=(Decimal(size.get('WeightMin')) + Decimal(size.get('WeightMax'))) / 2
-                     )
+
+                    size_qs = Size.objects.filter(product=new_product,size=size.get('Size'))
+
+                    if size_qs.exists():
+                        size_obj = size_qs.first()
+                        size_obj.quantity = size_obj.quantity + int(size.get('Quantity',0))
+
+                        if price > size_obj.price:
+                            size_obj.price = price
+
+                        if Decimal(size.get('WeightMin')) < size_obj.min_weight:
+                            size_obj.min_weight = Decimal(size.get('WeightMin'))
+
+                        if Decimal(size.get('WeightMax')) < size_obj.max_weight:
+                            size_obj.max_weight = Decimal(size.get('WeightMax'))
+
+                        size_obj.avg_weight = (size_obj.min_weight + size_obj.max_weight) / 2
+                        size_obj.save()
+                    else:
+                        Size.objects.create(
+                            product=new_product,
+                            size=size.get('Size'),
+                            quantity=int(size.get('Quantity',0)),
+                            price=price,
+                            min_weight=Decimal(size.get('WeightMin')),
+                            max_weight=Decimal(size.get('WeightMax')),
+                            avg_weight=(Decimal(size.get('WeightMin')) + Decimal(size.get('WeightMax'))) / 2
+                         )
                 x+=1
             except Exception as e:
                 print(e)

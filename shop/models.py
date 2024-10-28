@@ -5,75 +5,6 @@ from django_resized import ResizedImageField
 from random import choices
 import string
 
-class Category(models.Model):
-    order_num = models.IntegerField(default=1, null=True)
-    uid = models.CharField(max_length=255, blank=False, null=False)
-    icon = ResizedImageField(size=[20, 20], quality=95, force_format='WEBP', upload_to='shop/category/icon',
-                             blank=True, null=True)
-    image = ResizedImageField(size=[420, 420], quality=95, force_format='WEBP', upload_to='shop/category/images',
-                              blank=True, null=True)
-    name = models.CharField('Название', max_length=255, blank=False, null=False)
-    slug = models.CharField('ЧПУ', max_length=255,blank=True, null=True)
-    short_description = models.TextField('Короткое описание', blank=True, null=False)
-    html_content = CKEditor5Field('SEO текст', blank=True, null=False)
-    items_count = models.IntegerField('Кол-во товаров', default=0, null=True)
-    def __str__(self):
-        return f'{self.name}'
-
-    def save(self, *args, **kwargs):
-
-        self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
-
-    class Meta:
-        ordering = ('order_num',)
-        verbose_name = 'Категория'
-        verbose_name_plural = 'Категории'
-
-class SizeFilter(models.Model):
-    product = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=False,
-                                related_name='size_filters')
-    size = models.DecimalField('Размер', default=0, decimal_places=2, max_digits=5, blank=True, null=True)
-
-class SubCategoryFilter(models.Model):
-    uid = models.CharField(max_length=255, blank=False, null=False)
-    name = models.CharField('Название', max_length=255, blank=False, null=False)
-    slug = models.CharField('ЧПУ', max_length=255, blank=True, null=True)
-
-    def save(self, *args, **kwargs):
-
-        self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f'{self.name}'
-
-
-class SubCategory(models.Model):
-    order_num = models.IntegerField(default=1, null=True)
-    uid = models.CharField(max_length=255, blank=False, null=False)
-    filters = models.ManyToManyField(SubCategoryFilter, blank=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=False, null=True, related_name='sub_categories')
-    name = models.CharField('Название', max_length=255, blank=False, null=False)
-    slug = models.CharField('ЧПУ', max_length=255,blank=True, null=True)
-    image = ResizedImageField(size=[420, 420], quality=95, force_format='WEBP', upload_to='shop/category/images',
-                              blank=True, null=True)
-    short_description = models.TextField('Короткое описание', blank=True, null=False)
-    html_content = CKEditor5Field('SEO текст', blank=True, null=False)
-    items_count = models.IntegerField('Кол-во товаров', default=0, null=True)
-
-    def __str__(self):
-        return f'{self.name}'
-
-    def save(self, *args, **kwargs):
-
-        self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
-
-    class Meta:
-        ordering = ('order_num',)
-        verbose_name = 'Подкатегория'
-        verbose_name_plural = 'Подкатегории'
 
 class Material(models.Model):
     uid = models.CharField(max_length=255, blank=False, null=False)
@@ -125,6 +56,89 @@ class Coating(models.Model):
         verbose_name = 'Покрытие'
         verbose_name_plural = 'Покрытия'
 
+class Category(models.Model):
+    order_num = models.IntegerField(default=1, null=True)
+    uid = models.CharField(max_length=255, blank=False, null=False)
+    icon = ResizedImageField(size=[20, 20], quality=95, force_format='WEBP', upload_to='shop/category/icon',
+                             blank=True, null=True)
+    image = ResizedImageField(size=[420, 420], quality=95, force_format='WEBP', upload_to='shop/category/images',
+                              blank=True, null=True)
+    coatings = models.ManyToManyField(Coating, blank=True, null=True)
+    materials = models.ManyToManyField(Material, blank=True, null=True)
+    name = models.CharField('Название', max_length=255, blank=False, null=False)
+    slug = models.CharField('ЧПУ', max_length=255,blank=True, null=True)
+    short_description = models.TextField('Короткое описание', blank=True, null=False)
+    html_content = CKEditor5Field('SEO текст', blank=True, null=False)
+    items_count = models.IntegerField('Кол-во товаров', default=0, null=True)
+    is_active = models.BooleanField('Отображать?', default=True, null=False)
+    def __str__(self):
+        return f'{self.name}'
+
+    def save(self, *args, **kwargs):
+
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ('order_num',)
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
+class SizeFilter(models.Model):
+    order_num = models.IntegerField(default=1, null=True)
+    product = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=False,
+                                related_name='size_filters')
+    size = models.DecimalField('Размер', default=0, decimal_places=2, max_digits=5, blank=True, null=True)
+    is_active = models.BooleanField('Отображать?', default=True, null=False)
+
+    class Meta:
+        ordering = ('order_num',)
+
+
+
+class SubCategoryFilter(models.Model):
+    uid = models.CharField(max_length=255, blank=False, null=False)
+    name = models.CharField('Название', max_length=255, blank=False, null=False)
+    slug = models.CharField('ЧПУ', max_length=255, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.name}'
+
+
+class SubCategory(models.Model):
+    order_num = models.IntegerField(default=1, null=True)
+    uid = models.CharField(max_length=255, blank=False, null=False)
+    filters = models.ManyToManyField(SubCategoryFilter, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=False, null=True, related_name='sub_categories')
+    name = models.CharField('Название', max_length=255, blank=False, null=False)
+    slug = models.CharField('ЧПУ', max_length=255,blank=True, null=True)
+    image = ResizedImageField(size=[420, 420], quality=95, force_format='WEBP', upload_to='shop/category/images',
+                              blank=True, null=True)
+    short_description = models.TextField('Короткое описание', blank=True, null=False)
+    html_content = CKEditor5Field('SEO текст', blank=True, null=False)
+    items_count = models.IntegerField('Кол-во товаров', default=0, null=True)
+    is_active = models.BooleanField('Отображать?', default=True, null=False)
+
+    def __str__(self):
+        return f'{self.name}'
+
+    def save(self, *args, **kwargs):
+
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ('order_num',)
+        verbose_name = 'Подкатегория'
+        verbose_name_plural = 'Подкатегории'
+
+
+
 
 class Product(models.Model):
     uid = models.CharField(max_length=255, blank=False, null=False)
@@ -164,10 +178,10 @@ class Product(models.Model):
 
 
 class Size(models.Model):
-    uid = models.CharField(max_length=255, blank=False, null=False)
+    uid = models.CharField(max_length=255, blank=True, null=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=False,
                                 related_name='sizes')
-    size = models.DecimalField('Размер', default=0, decimal_places=2, max_digits=5, blank=True, null=True)
+    size = models.CharField('Размер', max_length=20, blank=True, null=True)
     quantity = models.IntegerField('Остаток', blank=True, null=True)
     price = models.DecimalField('Цена', default=0, decimal_places=2, max_digits=7, blank=True, null=True)
     price_opt = models.DecimalField('Цена оптовая', default=0, decimal_places=2, max_digits=7, blank=True, null=True)
@@ -185,3 +199,17 @@ class Size(models.Model):
         verbose_name_plural = 'Размеры'
 
 
+
+
+class Popular(models.Model):
+    order_num = models.IntegerField(default=1, null=True)
+    uid = models.CharField(max_length=255, blank=False, null=False)
+
+    def __str__(self):
+        return f'{self.uid}'
+
+
+    class Meta:
+        ordering = ('order_num',)
+        verbose_name = 'Популярные товары'
+        verbose_name_plural = 'Популярные товары'

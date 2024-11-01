@@ -37,6 +37,8 @@ class ProductSerializer(serializers.ModelSerializer):
     cat_name = serializers.SerializerMethodField()
     subcat_slug = serializers.SerializerMethodField()
     subcat_name = serializers.SerializerMethodField()
+    min_price = serializers.SerializerMethodField()
+    avg_weight = serializers.SerializerMethodField()
     class Meta:
         model = Product
         fields = '__all__'
@@ -49,6 +51,14 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_subcat_name(self,obj):
         return obj.subcategory.name
+
+    def get_min_price(self, obj):
+        # Получаем минимальное значение price из связанных объектов Size
+        return obj.sizes.aggregate(min_price=Min('price'))['min_price']
+
+    def get_avg_weight(self, obj):
+        # Получаем среднее значение avg_weight из связанных объектов Size
+        return obj.sizes.aggregate(avg_weight=Avg('avg_weight'))['avg_weight']
 
 class ProductShortSerializer(serializers.ModelSerializer):
     cat_slug = serializers.SerializerMethodField()

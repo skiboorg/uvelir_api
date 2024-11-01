@@ -88,7 +88,7 @@ class SizeFilter(models.Model):
     order_num = models.IntegerField(default=1, null=True)
     product = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=False,
                                 related_name='size_filters')
-    size = models.DecimalField('Размер', default=0, decimal_places=2, max_digits=5, blank=True, null=True)
+    size = models.CharField('Размер', max_length=20, blank=True, null=True)
     is_active = models.BooleanField('Отображать?', default=True, null=False)
 
     class Meta:

@@ -21,3 +21,7 @@ class GetUser(generics.RetrieveAPIView):
     def get_object(self):
         return self.request.user
 
+
+class NewCallbackForm(generics.CreateAPIView):
+    serializer_class = CallbackFormSerializer
+    queryset = CallbackForm.objects.all()

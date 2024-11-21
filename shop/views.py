@@ -51,13 +51,13 @@ class GetSubCategory(generics.ListAPIView):
         category_slug = self.request.query_params.get('category')
 
         # Получаем параметры фильтрации из запроса
-        size_values = self.request.query_params.get('size')
+        size_values = self.request.query_params.getlist('size')
         coating_value = self.request.query_params.get('coating')
         fineness_value = self.request.query_params.get('fineness')
-        filter_value = self.request.query_params.get('filter_value')
+        filter_value = self.request.query_params.get('filter')
         price_from = self.request.query_params.get('price__gte',0)
         price_to = self.request.query_params.get('price__lte',0)
-        print(price_from, price_to)
+        print(size_values)
         filters = None
         # Базовый queryset
         if subcategory_slug == 'all' and category_slug:
@@ -74,8 +74,8 @@ class GetSubCategory(generics.ListAPIView):
         # Применение фильтров
         if size_values:
             # Разбиваем строку значений на список
-            size_values_list = size_values.split(',')
-            queryset = queryset.filter(sizes__size__in=size_values_list)
+            #size_values_list = size_values.split(',')
+            queryset = queryset.filter(sizes__size__in=size_values)
 
         if coating_value:
             queryset = queryset.filter(coating__value=coating_value)
@@ -83,13 +83,15 @@ class GetSubCategory(generics.ListAPIView):
         if fineness_value:
             queryset = queryset.filter(fineness__value=fineness_value)
 
-        if filter_value:
-            queryset = queryset.filter(filter__slug=filter_value)
+
 
         if price_from and price_to:
             queryset = queryset.filter(
                 Q(sizes__price__gte=price_from) & Q(sizes__price__lte=price_to)
             )
+
+        if filter_value:
+            queryset = queryset.filter(filter__slug=filter_value)
 
         return queryset.distinct()
 
@@ -232,6 +234,7 @@ class Test1(APIView):
                 filename = product.get('FileName')
                 subcategory_obj = None
                 image = None
+                no_image = True
                 if not subcategory.exists() and subcategory_filter.exists():
                     subcategory_qs = SubCategory.objects.filter(filters__in=subcategory_filter)
                     if subcategory_qs.exists():
@@ -242,6 +245,9 @@ class Test1(APIView):
 
                 if filename != 'NULL':
                     image = f'shop/product/images/{filename}'
+                    no_image = False
+
+
 
 
                 new_product, _ = Product.objects.get_or_create(
@@ -255,6 +261,7 @@ class Test1(APIView):
                     is_active=False if not subcategory_obj else True,
                     name=product.get('Name'),
                     image=image,
+                    no_image=no_image
                 )
 
                 for size in sizes:

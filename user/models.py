@@ -72,3 +72,11 @@ def user_post_save(sender, instance, created, **kwargs):
 
 post_save.connect(user_post_save, sender=User)
 
+class CallbackForm(models.Model):
+    fio = models.CharField(max_length=255, blank=True, null=False)
+    phone = models.CharField(max_length=255, blank=True, null=False)
+    comment = models.TextField(max_length=255, blank=True, null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.created_at}'

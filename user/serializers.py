@@ -20,6 +20,12 @@ logger = logging.getLogger(__name__)
 
 
 
+class CallbackFormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CallbackForm
+        fields = '__all__'
+
+
 class UserSerializer(serializers.ModelSerializer):
     orders = OrderSerializer(many=True, read_only=True)
     class Meta:

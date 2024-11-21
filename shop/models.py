@@ -142,7 +142,7 @@ class SubCategory(models.Model):
 
 class Product(models.Model):
     uid = models.CharField(max_length=255, blank=False, null=False)
-    article = models.CharField('Артикул',max_length=20,blank=True, null=True)
+    article = models.CharField('Артикул',max_length=100,blank=True, null=True)
     subcategory = models.ForeignKey(SubCategory,blank=True,null=True,on_delete=models.CASCADE, related_name='products')
     coating = models.ForeignKey(Coating,blank=True,null=True,on_delete=models.CASCADE, related_name='Покрытие')
     fineness = models.ForeignKey(Fineness,blank=True,null=True,on_delete=models.CASCADE, related_name='Вставка')
@@ -152,6 +152,7 @@ class Product(models.Model):
     is_popular = models.BooleanField('Популярный', default=False, null=False)
     is_active = models.BooleanField('Отображать?', default=True, null=False)
     is_in_stock = models.BooleanField('В наличии?', default=True, null=False)
+    not_image = models.BooleanField(default=False, null=False)
     image = ResizedImageField(size=[800, 600], quality=95, force_format='WEBP', upload_to='shop/product/images',
                               blank=True, null=True)
 
@@ -166,7 +167,7 @@ class Product(models.Model):
         return f'{self.name}'
 
     class Meta:
-        # ordering = ('order_num',)
+        ordering = ('not_image',)
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
 

@@ -15,4 +15,5 @@ urlpatterns = [
     path('updateitems', views.Test1.as_view()),
     path('test', views.Test.as_view()),
     path('search', views.ProductSearchView.as_view()),
+    path('fav', views.FavoriteView.as_view()),
 ]

@@ -72,7 +72,9 @@ class ProductShortSerializer(serializers.ModelSerializer):
     material = MaterialSerializer(many=False, required=False, read_only=True)
     class Meta:
         model = Product
-        fields = ['name',
+        fields = [
+            'id',
+            'name',
                   'slug',
                   'image',
                   'cat_slug',
@@ -121,7 +123,7 @@ class SubCategorySerializer(serializers.ModelSerializer):
 class SizeFilterSerializer(serializers.ModelSerializer):
     class Meta:
         model = SizeFilter
-        fields = ['id','size']
+        fields = ['id','size','is_active']
 
 class CategorySerializer(serializers.ModelSerializer):
     size_filters = SizeFilterSerializer(many=True, required=False, read_only=True)
@@ -169,7 +171,9 @@ class SubCategoryShortSerializer(serializers.ModelSerializer):
 
 
 
-
-
-
+class FavoriteSerializer(serializers.ModelSerializer):
+    product = ProductShortSerializer(many=False, read_only=True)
+    class Meta:
+        model = Favorite
+        fields = '__all__'
 

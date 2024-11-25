@@ -263,6 +263,9 @@ class Test1(APIView):
                     image=image,
                     no_image=no_image
                 )
+                if len(sizes) == 0:
+                    new_product.is_active = False
+                    new_product.save()
 
                 for size in sizes:
                     if subcategory_obj:
@@ -333,6 +336,27 @@ class Test(APIView):
         response = requests.post('https://felfri.ru/api/shop/updatetable', json=data)
         print(response.text)
         return Response(status=200)
+
+class FavoriteView(APIView):
+    def get(self, request):
+        fav= Favorite.objects.filter(user=request.user)
+        serializer = FavoriteSerializer(fav, many=True)
+        return Response(serializer.data, status=200)
+    
+    def post(self, request):
+        data = request.data
+        print(data)
+        product = Product.objects.get(id=data['product_id'])
+        print(product)
+        fav_item, created = Favorite.objects.get_or_create(product=product,user=request.user)
+        if not created:
+            fav_item.delete()
+            message = 'Удалено из избранного'
+        else:
+            message = 'Добавлено в избранное'
+
+        return Response({'message':message}, status=200)
+
 
 class ProductSearchView(APIView):
     def get(self, request, *args, **kwargs):

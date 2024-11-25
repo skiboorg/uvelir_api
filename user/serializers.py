@@ -28,6 +28,7 @@ class CallbackFormSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     orders = OrderSerializer(many=True, read_only=True)
+    favorites = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = [
@@ -35,7 +36,8 @@ class UserSerializer(serializers.ModelSerializer):
             "fio",
             "phone",
             'email',
-            'orders'
+            'orders',
+            'favorites'
 
         ]
 
@@ -43,6 +45,11 @@ class UserSerializer(serializers.ModelSerializer):
             'password': {'required': False},
 
         }
+    def get_favorites(self, obj):
+        result = []
+        for favorite in obj.favorites.all():
+            result.append(favorite.product.id)
+        return result
 
 
 class UserCreateSerializer(serializers.ModelSerializer):

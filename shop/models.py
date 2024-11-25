@@ -214,3 +214,8 @@ class Popular(models.Model):
         ordering = ('order_num',)
         verbose_name = 'Популярные товары'
         verbose_name_plural = 'Популярные товары'
+
+
+class Favorite(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, blank=False)
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE, null=False, blank=False, related_name='favorites')

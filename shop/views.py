@@ -10,7 +10,11 @@ from rest_framework import generics
 from .models import *
 import json
 
-
+from PIL import Image, ImageOps
+from io import BytesIO
+from django.core.files.base import ContentFile
+import os
+from django.conf import settings
 
 class GetCategories(generics.ListAPIView):
     serializer_class = CategoryShortSerializer
@@ -155,6 +159,44 @@ class GetNewProducts(generics.ListAPIView):
     serializer_class = ProductShortSerializer
     queryset = Product.objects.filter(is_new=True, is_active=True)
 
+
+def process_image_to_webp(file_path, output_size=(500, 500)):
+    """
+    Уменьшает изображение до указанного размера, добавляет прозрачный фон и сохраняет в формате webp.
+    :param file_path: Относительный путь к файлу внутри MEDIA_ROOT (например, "shop/product/images/123.jpg").
+    :param output_size: Размер выходного изображения (по умолчанию 500x500).
+    :return: ContentFile объекта обработанного изображения.
+    """
+    # Абсолютный путь к файлу
+    absolute_path = os.path.join(settings.MEDIA_ROOT, file_path)
+    print(absolute_path)
+    # Открываем исходное изображение
+    with Image.open(absolute_path) as img:
+        # Преобразуем изображение в RGBA для работы с прозрачностью
+        img = img.convert("RGBA")
+
+        # Создаем пустое изображение с прозрачным фоном
+        new_img = Image.new("RGBA", output_size, (255, 255, 255, 0))
+
+        # Масштабируем изображение с сохранением пропорций
+        img.thumbnail(output_size, Image.Resampling.LANCZOS)
+
+        # Вычисляем координаты для вставки изображения по центру
+        x_offset = (output_size[0] - img.width) // 2
+        y_offset = (output_size[1] - img.height) // 2
+
+        # Вставляем изображение в центр пустого фона
+        new_img.paste(img, (x_offset, y_offset), img)
+
+        # Сохраняем изображение в формате WebP
+        buffer = BytesIO()
+        new_img.save(buffer, format="WEBP")
+        buffer.seek(0)
+
+        # Возвращаем объект ContentFile с новым файлом
+        file_name = os.path.splitext(os.path.basename(file_path))[0] + ".webp"
+        return ContentFile(buffer.read(), name=file_name)
+
 class Test1(APIView):
     def get(self, request):
         # Category.objects.all().delete()
@@ -234,7 +276,7 @@ class Test1(APIView):
                 filename = product.get('FileName')
                 subcategory_obj = None
                 image = None
-                no_image = True
+                not_image = True
                 if not subcategory.exists() and subcategory_filter.exists():
                     subcategory_qs = SubCategory.objects.filter(filters__in=subcategory_filter)
                     if subcategory_qs.exists():
@@ -244,8 +286,12 @@ class Test1(APIView):
                     subcategory_obj = subcategory.first()
 
                 if filename != 'NULL':
-                    image = f'shop/product/images/{filename}'
-                    no_image = False
+                    image_path = f'shop/product/images/{filename}'
+                    not_image = False
+                    try:
+                        image = process_image_to_webp(image_path)
+                    except:
+                        image = None
 
 
 
@@ -261,11 +307,11 @@ class Test1(APIView):
                     is_active=False if not subcategory_obj else True,
                     name=product.get('Name'),
                     image=image,
-                    no_image=no_image
+                    not_image=not_image
                 )
-                if len(sizes) == 0:
-                    new_product.is_active = False
-                    new_product.save()
+                # if len(sizes) == 0:
+                #     new_product.is_active = False
+                #     new_product.save()
 
                 for size in sizes:
                     if subcategory_obj:
@@ -277,8 +323,7 @@ class Test1(APIView):
                     price_key = size.get('RetailPrice')
                     if price_key == '':
                         price = 0
-                        new_product.is_active = False
-                        new_product.save()
+
                     else:
                         price = Decimal(price_key.replace(',','.'))
 
@@ -300,7 +345,7 @@ class Test1(APIView):
                         size_obj.avg_weight = (size_obj.min_weight + size_obj.max_weight) / 2
                         size_obj.save()
                     else:
-                        Size.objects.create(
+                        new_size =Size.objects.create(
                             product=new_product,
                             size=size.get('Size'),
                             quantity=int(size.get('Quantity',0)),
@@ -309,6 +354,9 @@ class Test1(APIView):
                             max_weight=Decimal(size.get('WeightMax')),
                             avg_weight=(Decimal(size.get('WeightMin')) + Decimal(size.get('WeightMax'))) / 2
                          )
+                        if new_size.price == 0:
+                            new_product.is_active = False
+                            new_product.save()
                 x+=1
             except Exception as e:
                 print(e)

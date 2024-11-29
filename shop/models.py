@@ -153,8 +153,7 @@ class Product(models.Model):
     is_active = models.BooleanField('Отображать?', default=True, null=False)
     is_in_stock = models.BooleanField('В наличии?', default=True, null=False)
     not_image = models.BooleanField(default=False, null=False)
-    image = ResizedImageField(size=[800, 600], quality=95, force_format='WEBP', upload_to='shop/product/images',
-                              blank=True, null=True)
+    image = models.ImageField(upload_to='shop/product/images_fixed', blank=True, null=True)
 
     name = models.CharField('Название', max_length=255, blank=False, null=True)
     slug = models.CharField('ЧПУ',max_length=255,

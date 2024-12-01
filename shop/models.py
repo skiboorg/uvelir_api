@@ -166,7 +166,7 @@ class Product(models.Model):
         return f'{self.name}'
 
     class Meta:
-        ordering = ('not_image',)
+        ordering = ('-image',)
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
 

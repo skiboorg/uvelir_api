@@ -51,7 +51,7 @@ class OrderView(APIView):
                 price=item.size.price
             )
             item.delete()
-        result = {'success': True, 'message': f'Заказ {new_order.id} создан'}
+        result = {'success': True, 'message': new_order.id}
         return Response(result, status=200)
 
 

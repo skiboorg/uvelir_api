@@ -135,11 +135,12 @@ def updateItems(file = None):
 
             if filename != 'NULL':
                 image_path = f'shop/product/images/{filename}'
-                not_image = False
                 try:
                     image = process_image_to_webp(image_path)
+                    not_image = False
                 except:
                     image = None
+
 
             new_product, _ = Product.objects.get_or_create(
                 uid=product.get('ID'),

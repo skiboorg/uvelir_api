@@ -25,3 +25,17 @@ class GetUser(generics.RetrieveAPIView):
 class NewCallbackForm(generics.CreateAPIView):
     serializer_class = CallbackFormSerializer
     queryset = CallbackForm.objects.all()
+
+class UpdateUser(APIView):
+    def patch(self, request):
+        print(request.data)
+        serializer = UserSerializer(instance=request.user, data=request.data)
+        password = request.data.get('password', None)
+        if serializer.is_valid():
+            user = serializer.save()
+            if password:
+                user.set_password(password)
+                user.save()
+
+        return Response(status=status.HTTP_200_OK)
+

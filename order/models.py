@@ -3,6 +3,19 @@ from decimal import Decimal
 from django_resized import ResizedImageField
 
 
+class Status(models.Model):
+    name = models.CharField('Название доставки',max_length=255)
+    is_default = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.name}'
+
+    class Meta:
+
+        verbose_name = 'Доставка'
+        verbose_name_plural = 'Доставка'
+
+
 class Delivery(models.Model):
     name = models.CharField('Название доставки',max_length=255)
     image = ResizedImageField(size=[800, 600], quality=95, force_format='WEBP', upload_to='shop/order/delivery',

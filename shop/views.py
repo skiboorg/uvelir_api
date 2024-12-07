@@ -59,6 +59,7 @@ class GetSubCategory(generics.ListAPIView):
         price_from = self.request.query_params.get('price__gte',0)
         price_to = self.request.query_params.get('price__lte',0)
         print(size_values)
+
         filters = None
         # Базовый queryset
         if subcategory_slug == 'all' and category_slug:
@@ -66,11 +67,18 @@ class GetSubCategory(generics.ListAPIView):
             if category:
                 subcategories = SubCategory.objects.filter(category=category)
 
-                queryset = Product.objects.filter(subcategory__in=subcategories, is_active=True)
+                if self.request.user.is_authenticated and self.request.user.is_opt_user:
+                    queryset = Product.objects.filter(subcategory__in=subcategories, is_active=True)
+                else:
+                    queryset = Product.objects.filter(subcategory__in=subcategories, is_active=True, not_image=False)
             else:
                 return Product.objects.none()
         else:
-            queryset = Product.objects.filter(subcategory__slug=subcategory_slug, is_active=True)
+            if self.request.user.is_authenticated and self.request.user.is_opt_user:
+                queryset = Product.objects.filter(subcategory__slug=subcategory_slug, is_active=True)
+            else:
+                queryset = Product.objects.filter(subcategory__slug=subcategory_slug, is_active=True,
+                                                  not_image=False)
 
         # Применение фильтров
         if size_values:

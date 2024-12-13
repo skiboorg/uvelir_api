@@ -53,7 +53,8 @@ def updateItems(file = None):
     Product.objects.all().delete()
     if file:
         # Если файл передан, используем его
-        data = json.loads(file)
+        # data = json.loads(file)
+        data = file
     else:
         # Если файл не передан, читаем из тестового файла
         with open('test.json', 'r', encoding='utf-8') as f:
@@ -190,6 +191,7 @@ def updateItems(file = None):
 
                     size_obj.avg_weight = (size_obj.min_weight + size_obj.max_weight) / 2
                     size_obj.save()
+                    new_product.items_count += size_obj.quantity
                 else:
                     new_size = Size.objects.create(
                         product=new_product,
@@ -203,6 +205,7 @@ def updateItems(file = None):
                     if new_size.price == 0:
                         new_product.is_active = False
                         new_product.save()
+                    new_product.items_count += new_size.quantity
             x += 1
         except Exception as e:
             print(e)

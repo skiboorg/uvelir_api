@@ -1,5 +1,5 @@
 from rest_framework import exceptions, serializers, status, generics
-from django.db.models import Min, Avg
+from django.db.models import Min, Avg, Sum
 
 from .models import *
 
@@ -67,6 +67,7 @@ class ProductShortSerializer(serializers.ModelSerializer):
     subcat_text = serializers.SerializerMethodField()
     min_price = serializers.SerializerMethodField()
     avg_weight = serializers.SerializerMethodField()
+    items_count = serializers.SerializerMethodField()
     coating = CoatingSerializer(many=False, required=False, read_only=True)
     fineness = FinenessSerializer(many=False, required=False, read_only=True)
     material = MaterialSerializer(many=False, required=False, read_only=True)
@@ -91,7 +92,12 @@ class ProductShortSerializer(serializers.ModelSerializer):
                   'material',
                   'min_price',
                   'avg_weight',
+                    'items_count'
                   ]
+    def get_items_count(self, obj):
+        return obj.sizes.aggregate(total=Sum('quantity'))['total']
+
+
     def get_min_price(self, obj):
         # Получаем минимальное значение price из связанных объектов Size
         return obj.sizes.aggregate(min_price=Min('price'))['min_price']

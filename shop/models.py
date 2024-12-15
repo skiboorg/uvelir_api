@@ -161,7 +161,7 @@ class Product(models.Model):
                             blank=True, null=True, editable=False)
     short_description = models.TextField('Короткое описание', blank=True, null=False)
     description = CKEditor5Field('Описание', blank=True, null=True, config_name='extends')
-
+    items_count = models.IntegerField('Кол-во товаров', default=0, null=True)
     def __str__(self):
         return f'{self.name}'
 

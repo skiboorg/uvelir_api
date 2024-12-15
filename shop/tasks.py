@@ -77,7 +77,6 @@ def updateItems(file = None):
         subcategories = category.get('Elements', [])
         new_category, _ = Category.objects.get_or_create(uid=category_uuid, name=category_name)
         for subcategory in subcategories:
-            print(subcategory)
             subcategory_uuid = subcategory.get('SubcategoryID')
             subcategory_name = subcategory.get('Name')
             new_subcategory, _ = SubCategory.objects.get_or_create(
@@ -168,11 +167,20 @@ def updateItems(file = None):
                         size=size.get('Size')
                     )
                 price_key = size.get('RetailPrice')
+                price_opt_key = size.get('WholesalePrice')
+
+                print('price_key',price_key)
+                print('price_opt_key',price_opt_key)
+
                 if price_key == '':
                     price = 0
-
                 else:
                     price = Decimal(price_key.replace(',', '.'))
+
+                if price_opt_key == '':
+                    price_opt = 0
+                else:
+                    price_opt = Decimal(price_opt_key.replace(',', '.'))
 
                 size_qs = Size.objects.filter(product=new_product, size=size.get('Size'))
 
@@ -191,13 +199,13 @@ def updateItems(file = None):
 
                     size_obj.avg_weight = (size_obj.min_weight + size_obj.max_weight) / 2
                     size_obj.save()
-                    new_product.items_count += size_obj.quantity
                 else:
                     new_size = Size.objects.create(
                         product=new_product,
                         size=size.get('Size'),
                         quantity=int(size.get('Quantity', 0)),
                         price=price,
+                        price_opt=price_opt,
                         min_weight=Decimal(size.get('WeightMin')),
                         max_weight=Decimal(size.get('WeightMax')),
                         avg_weight=(Decimal(size.get('WeightMin')) + Decimal(size.get('WeightMax'))) / 2
@@ -205,7 +213,7 @@ def updateItems(file = None):
                     if new_size.price == 0:
                         new_product.is_active = False
                         new_product.save()
-                    new_product.items_count += new_size.quantity
+
             x += 1
         except Exception as e:
             print(e)

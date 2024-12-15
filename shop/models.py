@@ -4,6 +4,7 @@ from django_ckeditor_5.fields import CKEditor5Field
 from django_resized import ResizedImageField
 from random import choices
 import string
+import random
 
 
 class Material(models.Model):
@@ -76,7 +77,11 @@ class Category(models.Model):
 
     def save(self, *args, **kwargs):
 
-        self.slug = slugify(self.name)
+        exist_cat = Category.objects.filter(slug=slugify(self.name))
+        if exist_cat.exists():
+            self.slug = f'{slugify(self.name)}-{''.join(random.choices(string.ascii_letters + string.digits, k=3))}'
+        else:
+            self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
     class Meta:
@@ -128,8 +133,11 @@ class SubCategory(models.Model):
         return f'{self.name}'
 
     def save(self, *args, **kwargs):
-        
-        self.slug = slugify(self.name)
+        exist_subcat = SubCategory.objects.filter(slug=slugify(self.name))
+        if exist_subcat.exists():
+            self.slug = f'{slugify(self.name)}-{''.join(random.choices(string.ascii_letters + string.digits, k=3))}'
+        else:
+            self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
     class Meta:

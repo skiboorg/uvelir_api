@@ -79,7 +79,7 @@ class Category(models.Model):
 
         exist_cat = Category.objects.filter(slug=slugify(self.name))
         if exist_cat.exists():
-            self.slug = f'{slugify(self.name)}-{''.join(random.choices(string.ascii_letters + string.digits, k=3))}'
+            self.slug = f'{slugify(self.name)}-{"".join(random.choices(string.ascii_letters + string.digits, k=3))}'
         else:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
@@ -135,7 +135,7 @@ class SubCategory(models.Model):
     def save(self, *args, **kwargs):
         exist_subcat = SubCategory.objects.filter(slug=slugify(self.name))
         if exist_subcat.exists():
-            self.slug = f'{slugify(self.name)}-{''.join(random.choices(string.ascii_letters + string.digits, k=3))}'
+            self.slug = f'{slugify(self.name)}-{"".join(random.choices(string.ascii_letters + string.digits, k=3))}'
         else:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)

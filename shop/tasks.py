@@ -59,6 +59,12 @@ def updateItems(file = None):
         # Если файл не передан, читаем из тестового файла
         with open('test.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
+        Category.objects.all().delete()
+        SizeFilter.objects.all().delete()
+        Material.objects.all().delete()
+        Coating.objects.all().delete()
+        Fineness.objects.all().delete()
+        SubCategory.objects.all().delete()
 
     categories = data.get('Categories', {})
     materials_obj = data.get('Materials', {})

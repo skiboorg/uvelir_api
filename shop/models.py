@@ -128,7 +128,7 @@ class SubCategory(models.Model):
         return f'{self.name}'
 
     def save(self, *args, **kwargs):
-
+        
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 

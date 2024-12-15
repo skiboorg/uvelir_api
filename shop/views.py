@@ -75,9 +75,9 @@ class GetSubCategory(generics.ListAPIView):
                 return Product.objects.none()
         else:
             if self.request.user.is_authenticated and self.request.user.is_opt_user:
-                queryset = Product.objects.filter(subcategory__slug=subcategory_slug, is_active=True)
+                queryset = Product.objects.filter(subcategory__category__slug=subcategory_slug, subcategory__slug=subcategory_slug, is_active=True)
             else:
-                queryset = Product.objects.filter(subcategory__slug=subcategory_slug, is_active=True,
+                queryset = Product.objects.filter(subcategory__category__slug=subcategory_slug,subcategory__slug=subcategory_slug, is_active=True,
                                                   not_image=False)
 
         # Применение фильтров

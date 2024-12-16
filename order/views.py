@@ -26,6 +26,7 @@ class OrderView(APIView):
     def post(self, request):
         data = request.data
         print(data)
+        have_bad_items = False
         cart = get_cart(request)
         status,_ = Status.objects.get_or_create(is_default=True, name='Новый')
         if request.user.is_authenticated:
@@ -43,17 +44,21 @@ class OrderView(APIView):
             delivery_type_id=data['delivery_type'],
         )
         for item in cart.items.all():
-            OrderItem.objects.create(
-                order=new_order,
-                article=item.product.article,
-                image=item.product.image,
-                name=item.product.name,
-                avg_weight=item.size.avg_weight,
-                amount=item.amount,
-                price=item.size.price
-            )
-            item.delete()
-        result = {'success': True, 'message': new_order.id}
+            if item.size.quantity >= item.amount:
+                OrderItem.objects.create(
+                    order=new_order,
+                    article=item.product.article,
+                    image=item.product.image,
+                    name=item.product.name,
+                    avg_weight=item.size.avg_weight,
+                    amount=item.amount,
+                    price=item.size.price
+                )
+                item.delete()
+            else:
+                have_bad_items = True
+
+        result = {'success': True, 'message': new_order.id, 'have_bad_items':have_bad_items}
         return Response(result, status=200)
 
 

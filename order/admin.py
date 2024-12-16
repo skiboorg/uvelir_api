@@ -18,4 +18,5 @@ class OrderAdmin(NestedModelAdmin):
 admin.site.register(Order,OrderAdmin)
 admin.site.register(Delivery)
 admin.site.register(Payment)
+admin.site.register(Status)
 

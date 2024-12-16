@@ -4,7 +4,7 @@ from django_resized import ResizedImageField
 
 
 class Status(models.Model):
-    name = models.CharField('Название доставки',max_length=255)
+    name = models.CharField('Название',max_length=255)
     is_default = models.BooleanField(default=False)
 
     def __str__(self):
@@ -12,8 +12,8 @@ class Status(models.Model):
 
     class Meta:
 
-        verbose_name = 'Доставка'
-        verbose_name_plural = 'Доставка'
+        verbose_name = 'Статус'
+        verbose_name_plural = 'Статус'
 
 
 class Delivery(models.Model):
@@ -49,12 +49,13 @@ class Order(models.Model):
     order_id = models.CharField('Номер заказа', max_length=255, blank=True, null=True)
     user = models.ForeignKey('user.User',on_delete=models.CASCADE,blank=True, null=True,verbose_name='Юзер', related_name='orders')
     email = models.CharField('Почта', max_length=255, blank=True, null=True)
+    status = models.ForeignKey(Status,on_delete=models.SET_NULL,blank=True, null=True)
     fio = models.CharField('ФИО', max_length=255, blank=True, null=True)
     phone = models.CharField('Телефон', max_length=255, blank=True, null=True)
     payment_type = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True,verbose_name='Оплата')
     delivery_type = models.ForeignKey(Delivery, on_delete=models.SET_NULL, blank=True, null=True,verbose_name='Доставка')
     delivery_address = models.TextField('адрес доставки', blank=True, null=True)
-    created_at = models.DateField('Создан',auto_now_add=True, null=True)
+    created_at = models.DateTimeField('Создан',auto_now_add=True, null=True)
     is_paid = models.BooleanField('Оплачен', default=False, null=False)
     is_done = models.BooleanField('Обработан', default=False, null=False)
     is_deliveried = models.BooleanField('Доставлен', default=False, null=False)

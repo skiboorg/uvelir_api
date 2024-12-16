@@ -27,7 +27,7 @@ class OrderView(APIView):
         data = request.data
         print(data)
         cart = get_cart(request)
-        status,_ = Status.objects.get_or_create(is_default=True)
+        status,_ = Status.objects.get_or_create(is_default=True, name='Новый')
         if request.user.is_authenticated:
             user = request.user
         else:

@@ -6,6 +6,8 @@ from cart.views import get_cart
 from .serializers import *
 from .models import *
 
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 class OrderView(APIView):
     def get(self, request):
@@ -59,6 +61,10 @@ class OrderView(APIView):
                 have_bad_items = True
 
         result = {'success': True, 'message': new_order.id, 'have_bad_items':have_bad_items}
+
+        msg_html = render_to_string('form_notify.html', {'obj': new_order.id})
+        send_mail('Новый заказ', None, 'noreply@sh44.ru', ['741298@rambler.ru'],
+                  fail_silently=False, html_message=msg_html)
         return Response(result, status=200)
 
 

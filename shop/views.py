@@ -55,7 +55,7 @@ class GetSubCategory(generics.ListAPIView):
         size_values = self.request.query_params.getlist('size')
         coating_value = self.request.query_params.get('coating')
         fineness_value = self.request.query_params.get('fineness')
-        filter_value = self.request.query_params.get('filter')
+        filter_values = self.request.query_params.getlist('filter')
         price_from = self.request.query_params.get('price__gte',0)
         price_to = self.request.query_params.get('price__lte',0)
         print(size_values)
@@ -99,8 +99,8 @@ class GetSubCategory(generics.ListAPIView):
                 Q(sizes__price__gte=price_from) & Q(sizes__price__lte=price_to)
             )
 
-        if filter_value:
-            queryset = queryset.filter(filter__slug=filter_value)
+        if filter_values:
+            queryset = queryset.filter(filter__slug__in=filter_values)
 
         return queryset.distinct()
 

@@ -62,8 +62,8 @@ class OrderView(APIView):
 
         result = {'success': True, 'message': new_order.id, 'have_bad_items':have_bad_items}
 
-        msg_html = render_to_string('form_notify.html', {'obj': new_order.id})
-        send_mail('Новый заказ', None, 'noreply@sh44.ru', ['eridiankid@gmail.com'],
+        msg_html = render_to_string('order.html', {'order': new_order})
+        send_mail('Новый заказ', None, 'noreply@sh44.ru', [new_order.email,'stepenina@mail.ru'],
                   fail_silently=False, html_message=msg_html)
         return Response(result, status=200)
 

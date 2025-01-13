@@ -1,11 +1,13 @@
 
 from django.utils import timezone
 from datetime import timedelta
-
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions as django_exceptions
 from django.db import IntegrityError, transaction
+from django.contrib.auth.tokens import default_token_generator
 
 from rest_framework import exceptions, serializers, status, generics
 from .models import *
@@ -96,8 +98,13 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
         with transaction.atomic():
             user = User.objects.create_user(**validated_data)
-            user.is_active = True
-            user.save(update_fields=["is_active"])
+            token = default_token_generator.make_token(user)
+            user.is_active = False
+            user.activate_token = token
+            user.save(update_fields=["is_active","activate_token"])
+            msg_html = render_to_string('activate.html', {'token': token})
+            send_mail('Подтверждение регистрации аккаунта', None, 'noreply@sh44.ru', [user.email],
+                      fail_silently=False, html_message=msg_html)
 
         return user
 

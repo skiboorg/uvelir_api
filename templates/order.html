@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .order-info {
+            margin-bottom: 20px;
+        }
+        .order-info p {
+            margin: 5px 0;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .items-table th, .items-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .items-table th {
+            background-color: #f4f4f4;
+        }
+        .total-price {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .footer {
+            background: #f4f4f4;
+            color: #555;
+            padding: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Информация о вашем заказе</h1>
+        </div>
+        <div class="content">
+            <div class="order-info">
+                <p><strong>Номер заказа:</strong> {{ order.id }}</p>
+                <p><strong>Дата заказа:</strong> {{ order.created_at }}</p>
+                <p><strong>Статус:</strong> {{ order.status.name }}</p>
+                <p><strong>ФИО:</strong> {{ order.fio }}</p>
+                <p><strong>Телефон:</strong> {{ order.phone }}</p>
+                <p><strong>Email:</strong> {{ order.email }}</p>
+                <p><strong>Адрес доставки:</strong> {{ order.delivery_address }}</p>
+                <p><strong>Тип оплаты:</strong> {{ order.payment_type.name }}</p>
+                <p><strong>Тип доставки:</strong> {{ order.delivery_type.name }}</p>
+                <p><strong>Комментарий:</strong> {{ order.comment }}</p>
+            </div>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Артикул</th>
+                        <th>Название</th>
+                        <th>Количество</th>
+                        <th>Цена</th>
+                        <th>Общая стоимость</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                        <td>{{ item.article }}</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.amount }}</td>
+                        <td>{{ item.price }}</td>
+                        <td>{{ item.total_price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p class="total-price">Общая сумма: {{ order.total_price }}</p>
+        </div>
+        <div class="footer">
+            <p>Спасибо за ваш заказ!</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -88,3 +88,7 @@ class OrderItem(models.Model):
     amount = models.IntegerField(default=0, blank=True, null=True)
     price = models.DecimalField('Цена', decimal_places=2, max_digits=8, blank=True, null=True)
 
+    @property
+    def total_price(self):
+
+        return self.price * self.amount

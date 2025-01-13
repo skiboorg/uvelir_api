@@ -49,6 +49,7 @@ class User(AbstractUser):
     city = models.CharField('Город', max_length=255, blank=True, null=True)
     comment = models.TextField('Коментарий', blank=True, null=True)
     is_opt_user = models.BooleanField('Оптовый', default=False)
+    activate_token = models.CharField(max_length=255, blank=True, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

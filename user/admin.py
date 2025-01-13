@@ -10,6 +10,7 @@ class UserAdmin(BaseUserAdmin):
         'fio',
         'phone',
         'is_opt_user',
+        'is_active',
         'date_joined',
 
     )

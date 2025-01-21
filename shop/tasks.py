@@ -216,7 +216,7 @@ def updateItems(file = None):
                         max_weight=Decimal(size.get('WeightMax')),
                         avg_weight=(Decimal(size.get('WeightMin')) + Decimal(size.get('WeightMax'))) / 2
                     )
-                    if new_size.price == 0:
+                    if new_size.quantity == 0:
                         new_product.is_active = False
                         new_product.save()
 
@@ -224,5 +224,11 @@ def updateItems(file = None):
         except Exception as e:
             print(e)
             print(product)
+    all_sizes = Size.objects.all()
+    
+    for size in all_sizes:
+        size.price_opt = size.price_opt * size.max_weight
+        size.price= size.price_opt * Decimal(1.6)
+        size.save()
 
     return

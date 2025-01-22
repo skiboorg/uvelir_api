@@ -227,8 +227,11 @@ def updateItems(file = None):
     all_sizes = Size.objects.all()
     
     for size in all_sizes:
-        size.price_opt = size.price_opt * size.max_weight
-        size.price= size.price_opt * Decimal(1.6)
-        size.save()
+        try:
+            size.price_opt = size.price_opt * size.max_weight
+            size.price= size.price_opt * Decimal(1.6)
+            size.save()
+        except Exception as e:
+            print(e)
 
     return

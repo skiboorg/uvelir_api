@@ -12,7 +12,8 @@ class ProductAdmin(NestedModelAdmin):
     model = Product
     inlines = [SizeInline]
     readonly_fields = ['image_preview']
-    list_filter = ['is_popular','is_active']
+    list_filter = ['is_popular','is_active','null_opt_price','hidden_category']
+    search_fields = ('name','subcategory__name',)
 
     def image_preview(self, obj):
 

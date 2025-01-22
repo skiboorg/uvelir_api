@@ -161,6 +161,8 @@ class Product(models.Model):
     is_active = models.BooleanField('Отображать?', default=True, null=False)
     is_in_stock = models.BooleanField('В наличии?', default=True, null=False)
     not_image = models.BooleanField(default=False, null=False)
+    null_opt_price = models.BooleanField(default=False, null=False)
+    hidden_category = models.BooleanField(default=False, null=False)
     image = models.ImageField(upload_to='shop/product/images_fixed', blank=True, null=True)
 
     name = models.CharField('Название', max_length=255, blank=False, null=True)

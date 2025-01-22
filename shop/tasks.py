@@ -225,13 +225,23 @@ def updateItems(file = None):
             print(e)
             print(product)
     all_sizes = Size.objects.all()
-    
+    print('check sizes')
     for size in all_sizes:
         try:
+            if size.price_opt == 0:
+                size.product.null_opt_price = True
+                size.product.save()
             size.price_opt = size.price_opt * size.max_weight
             size.price= size.price_opt * Decimal(1.6)
             size.save()
         except Exception as e:
             print(e)
-
+    print('check categories')
+    for product in Product.objects.all():
+        try:
+            if not product.subcategory.category.is_active:
+                product.hidden_category = True
+                product.save()
+        except Exception as e:
+            print(e)
     return

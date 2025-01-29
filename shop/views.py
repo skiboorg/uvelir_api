@@ -156,7 +156,10 @@ class GetPopularProducts(generics.ListAPIView):
         products = []
         all_uuids = Popular.objects.all()
         for uuid in all_uuids:
-            products.append(Product.objects.get(uid=uuid))
+            try:
+                products.append(Product.objects.get(uid=uuid))
+            except Product.DoesNotExist:
+                pass
         return products
 
 

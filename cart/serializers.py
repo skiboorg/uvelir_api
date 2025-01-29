@@ -16,5 +16,6 @@ class CartSerializer(serializers.ModelSerializer):
         model = Cart
         fields = [
             'items',
-            'total_price'
+            'total_price',
+            'total_opt_price'
         ]

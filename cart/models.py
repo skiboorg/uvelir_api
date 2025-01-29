@@ -13,6 +13,13 @@ class Cart(models.Model):
             price += Decimal(item.size.price) * item.amount
         return price
 
+    @property
+    def total_opt_price(self):
+        price = 0
+        for item in self.items.all():
+            price += Decimal(item.size.price_opt) * item.amount
+        return price
+
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, blank=True, null=True, related_name='items')

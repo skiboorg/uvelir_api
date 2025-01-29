@@ -38,6 +38,7 @@ class ProductSerializer(serializers.ModelSerializer):
     subcat_slug = serializers.SerializerMethodField()
     subcat_name = serializers.SerializerMethodField()
     min_price = serializers.SerializerMethodField()
+    min_price_opt = serializers.SerializerMethodField()
     avg_weight = serializers.SerializerMethodField()
     class Meta:
         model = Product
@@ -55,6 +56,9 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_min_price(self, obj):
         # Получаем минимальное значение price из связанных объектов Size
         return obj.sizes.aggregate(min_price=Min('price'))['min_price']
+    def get_min_price_opt(self, obj):
+        # Получаем минимальное значение price из связанных объектов Size
+        return obj.sizes.aggregate(min_price=Min('price_opt'))['min_price']
 
     def get_avg_weight(self, obj):
         # Получаем среднее значение avg_weight из связанных объектов Size
@@ -66,6 +70,7 @@ class ProductShortSerializer(serializers.ModelSerializer):
     subcat_name = serializers.SerializerMethodField()
     subcat_text = serializers.SerializerMethodField()
     min_price = serializers.SerializerMethodField()
+    min_price_opt = serializers.SerializerMethodField()
     avg_weight = serializers.SerializerMethodField()
     items_count = serializers.SerializerMethodField()
     coating = CoatingSerializer(many=False, required=False, read_only=True)
@@ -91,6 +96,7 @@ class ProductShortSerializer(serializers.ModelSerializer):
                   'fineness',
                   'material',
                   'min_price',
+                  'min_price_opt',
                   'avg_weight',
                     'items_count'
                   ]
@@ -101,6 +107,10 @@ class ProductShortSerializer(serializers.ModelSerializer):
     def get_min_price(self, obj):
         # Получаем минимальное значение price из связанных объектов Size
         return obj.sizes.aggregate(min_price=Min('price'))['min_price']
+
+    def get_min_price_opt(self, obj):
+        # Получаем минимальное значение price из связанных объектов Size
+        return obj.sizes.aggregate(min_price=Min('price_opt'))['min_price']
 
     def get_avg_weight(self, obj):
         # Получаем среднее значение avg_weight из связанных объектов Size

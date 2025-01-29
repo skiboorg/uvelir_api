@@ -46,6 +46,11 @@ class OrderView(APIView):
             delivery_type_id=data['delivery_type'],
         )
         for item in cart.items.all():
+            price = 0
+            if request.user.is_authenticated and request.user.is_opt_user:
+                price = item.size.price_opt
+            else:
+                price = item.size.price
             if item.size.quantity >= item.amount:
                 OrderItem.objects.create(
                     order=new_order,
@@ -54,7 +59,7 @@ class OrderView(APIView):
                     name=item.product.name,
                     avg_weight=item.size.avg_weight,
                     amount=item.amount,
-                    price=item.size.price
+                    price=price
                 )
                 item.delete()
             else:

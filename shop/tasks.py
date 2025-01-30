@@ -231,8 +231,8 @@ def updateItems(file = None):
             if size.price_opt == 0:
                 size.product.null_opt_price = True
                 size.product.save()
-            price_opt = math.trunc((size.price_opt * size.max_weight) / 10) * 10
-            price = math.trunc((size.price_opt * Decimal(1.6)) / 10 ) * 10
+            price_opt = math.ceil(size.price_opt * size.max_weight)
+            price = math.trunc((price_opt * Decimal(1.6)) / 10 ) * 10
             size.price_opt = price_opt
             size.price= price
             size.save()

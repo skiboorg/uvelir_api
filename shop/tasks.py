@@ -81,7 +81,12 @@ def updateItems(file = None):
         category_uuid = category.get('CategoryID')
         category_name = category.get('Name')
         subcategories = category.get('Elements', [])
-        new_category, _ = Category.objects.get_or_create(uid=category_uuid, name=category_name)
+        new_category, created = Category.objects.get_or_create(uid=category_uuid, name=category_name)
+
+        if created:
+            new_category.is_active = False
+            new_category.save()
+
         for subcategory in subcategories:
             subcategory_uuid = subcategory.get('SubcategoryID')
             subcategory_name = subcategory.get('Name')

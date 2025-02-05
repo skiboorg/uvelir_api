@@ -102,7 +102,10 @@ class GetSubCategory(generics.ListAPIView):
         if filter_values:
             queryset = queryset.filter(filter__slug__in=filter_values)
 
-        return queryset.distinct()
+        not_sort_queryset = list(queryset.distinct())
+        not_sort_queryset.sort(key=lambda x: (not bool(x.image), x.name))
+
+        return not_sort_queryset #queryset.distinct()
 
     def get(self, request, *args, **kwargs):
         # Получаем стандартный пагинированный ответ

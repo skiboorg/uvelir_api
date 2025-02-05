@@ -217,9 +217,9 @@ def updateItems(file = None):
                         quantity=int(size.get('Quantity', 0)),
                         price=price,
                         price_opt=price_opt,
-                        min_weight=Decimal(size.get('WeightMin')),
-                        max_weight=Decimal(size.get('WeightMax')),
-                        avg_weight=(Decimal(size.get('WeightMin')) + Decimal(size.get('WeightMax'))) / 2
+                        min_weight=round(Decimal(size.get('WeightMin')),2),
+                        max_weight=round(Decimal(size.get('WeightMax')),2),
+                        avg_weight=round((Decimal(size.get('WeightMin')) + Decimal(size.get('WeightMax'))) / 2,2)
                     )
                     if new_size.quantity == 0:
                         new_product.is_active = False
@@ -237,7 +237,7 @@ def updateItems(file = None):
                 size.product.null_opt_price = True
                 size.product.save()
             price_opt = math.ceil(size.price_opt * size.max_weight)
-            price = math.trunc((price_opt * Decimal(1.6)) / 10 ) * 10
+            price = math.trunc((price_opt * Decimal(2)) / 10 ) * 10
             size.price_opt = price_opt
             size.price= price
             size.save()

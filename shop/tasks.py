@@ -219,7 +219,7 @@ def updateItems(file = None):
                         price_opt=price_opt,
                         min_weight=round(Decimal(size.get('WeightMin')),2),
                         max_weight=round(Decimal(size.get('WeightMax')),2),
-                        avg_weight=round((Decimal(size.get('WeightMin')) + Decimal(size.get('WeightMax'))) / 2,2)
+                        avg_weight=round((Decimal(size.get('WeightMin')) + Decimal(size.get('WeightMax')) / 2),2)
                     )
                     if new_size.quantity == 0:
                         new_product.is_active = False

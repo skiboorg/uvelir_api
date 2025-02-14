@@ -228,7 +228,7 @@ class ProductSearchView(APIView):
         # Фильтрация по каждому ключевому слову
         for keyword in keywords:
             products = products.filter(
-                Q(name__icontains=keyword) |
+                Q(name_lower__icontains=keyword) |
                 Q(coating__label__icontains=keyword) |
                 Q(fineness__label__icontains=keyword) |
                 Q(sizes__size__icontains=keyword)

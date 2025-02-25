@@ -226,7 +226,7 @@ class ProductSearchView(generics.ListAPIView):
         keywords = query.split()
 
         # Базовый запрос для поиска активных продуктов
-        products = Product.objects.filter(name_lower__icontains=query, is_active=True)
+        products = Product.objects.filter(name_lower__icontains=query.lower(), is_active=True)
         return products
         # Фильтрация по каждому ключевому слову
         for keyword in keywords:

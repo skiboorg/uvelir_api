@@ -212,6 +212,7 @@ class Size(models.Model):
         return f'{self.product.name} - {self.price}'
 
     class Meta:
+        ordering = ('size',)
         verbose_name = 'Размер'
         verbose_name_plural = 'Размеры'
 

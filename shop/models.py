@@ -188,6 +188,11 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
 
+class Image(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=False,
+                                related_name='images')
+    file = models.ImageField(upload_to='shop/product/images_fixed', blank=True, null=True)
+
 
 class Size(models.Model):
     uid = models.CharField(max_length=255, blank=True, null=False)

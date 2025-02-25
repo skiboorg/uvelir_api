@@ -7,10 +7,14 @@ class SizeInline(NestedStackedInline):
     model = Size
     extra = 0
 
+class ImageInline(NestedStackedInline):
+    model = Image
+    extra = 0
+
 class ProductAdmin(NestedModelAdmin):
     list_display = ('image_preview','article','name','subcategory','filter','is_new','is_popular','is_active',)
     model = Product
-    inlines = [SizeInline]
+    inlines = [SizeInline,ImageInline]
     readonly_fields = ['image_preview']
     list_filter = ['is_popular','is_active','null_opt_price','hidden_category']
     search_fields = ('name','subcategory__name',)

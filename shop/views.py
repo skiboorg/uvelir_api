@@ -217,14 +217,17 @@ class FavoriteView(APIView):
         return Response({'message':message}, status=200)
 
 
-class ProductSearchView(APIView):
-    def get(self, request, *args, **kwargs):
-        query = request.GET.get('q', '')  # Получаем значение параметра "q" из GET-запроса
+class ProductSearchView(generics.ListAPIView):
+    pagination_class = StandardResultsSetPagination
+    serializer_class = ProductShortSerializer
+
+    def get_queryset(self):
+        query = self.request.GET.get('q', '')  # Получаем значение параметра "q" из GET-запроса
         keywords = query.split()
 
         # Базовый запрос для поиска активных продуктов
-        products = Product.objects.filter(is_active=True)
-
+        products = Product.objects.filter(name_lower__icontains=query, is_active=True)
+        return products
         # Фильтрация по каждому ключевому слову
         for keyword in keywords:
             products = products.filter(

@@ -174,7 +174,7 @@ class GetNewProducts(generics.ListAPIView):
 
 class UpdateItems(APIView):
     def get(self, request):
-        updateItems.delay()
+        updateItems()
         return Response({"status": "file processed"}, status=202)
 
     def post(self, request):
@@ -228,15 +228,9 @@ class ProductSearchView(generics.ListAPIView):
         # Базовый запрос для поиска активных продуктов
         products = Product.objects.filter(name_lower__icontains=query.lower(), is_active=True)
         return products
-        # Фильтрация по каждому ключевому слову
-        for keyword in keywords:
-            products = products.filter(
-                Q(name_lower__icontains=keyword) |
-                Q(coating__label__icontains=keyword) |
-                Q(fineness__label__icontains=keyword) |
-                Q(sizes__size__icontains=keyword)
-            ).distinct()
 
-        # Сериализуем результаты
-        serializer = ProductShortSerializer(products, many=True)
-        return Response(serializer.data)
+
+
+class GetBanners(generics.ListAPIView):
+    queryset = Banner.objects.all()
+    serializer_class = BannerSerializer

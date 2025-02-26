@@ -2,6 +2,10 @@ from rest_framework import exceptions, serializers, status, generics
 from django.db.models import Min, Avg, Sum
 
 from .models import *
+class BannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Banner
+        fields = '__all__'
 
 class CoatingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,6 +30,10 @@ class SubCategoryFilterSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubCategoryFilter
         fields = '__all__'
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = '__all__'
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -40,9 +48,13 @@ class ProductSerializer(serializers.ModelSerializer):
     min_price = serializers.SerializerMethodField()
     min_price_opt = serializers.SerializerMethodField()
     avg_weight = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+    images = ProductImageSerializer(many=True,required=False,read_only=True)
     class Meta:
         model = Product
         fields = '__all__'
+    def get_image(self, obj):
+        return obj.images.filter(is_main=True).first().file.url
     def get_cat_slug(self,obj):
         return obj.subcategory.category.slug
     def get_cat_name(self,obj):
@@ -73,6 +85,7 @@ class ProductShortSerializer(serializers.ModelSerializer):
     min_price_opt = serializers.SerializerMethodField()
     avg_weight = serializers.SerializerMethodField()
     items_count = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
     coating = CoatingSerializer(many=False, required=False, read_only=True)
     fineness = FinenessSerializer(many=False, required=False, read_only=True)
     material = MaterialSerializer(many=False, required=False, read_only=True)
@@ -81,25 +94,28 @@ class ProductShortSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
-                  'slug',
-                  'image',
-                  'cat_slug',
-                  'subcat_name',
-                  'subcat_slug',
-                  'subcat_text',
-                  'is_new',
-                  'article',
-                  'is_popular',
-                  'is_active',
-                  'is_in_stock',
-                  'coating',
-                  'fineness',
-                  'material',
-                  'min_price',
-                  'min_price_opt',
-                  'avg_weight',
-                    'items_count'
+              'slug',
+              'image',
+              'cat_slug',
+              'subcat_name',
+              'subcat_slug',
+              'subcat_text',
+              'is_new',
+              'article',
+              'is_popular',
+              'is_active',
+              'is_in_stock',
+              'coating',
+              'fineness',
+              'material',
+              'min_price',
+              'min_price_opt',
+              'avg_weight',
+                'items_count'
                   ]
+    def get_image(self, obj):
+        return obj.images.filter(is_main=True).first().file.url
+
     def get_items_count(self, obj):
         return obj.sizes.aggregate(total=Sum('quantity'))['total']
 

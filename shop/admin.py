@@ -8,7 +8,7 @@ class SizeInline(NestedStackedInline):
     extra = 0
 
 class ImageInline(NestedStackedInline):
-    model = Image
+    model = ProductImage
     extra = 0
 
 class ProductAdmin(NestedModelAdmin):
@@ -21,9 +21,9 @@ class ProductAdmin(NestedModelAdmin):
 
     def image_preview(self, obj):
 
-        if obj.image:
+        if obj.images.filter(is_main=True).first():
             return mark_safe(
-                '<img src="{0}" width="150" height="150" style="object-fit:contain" />'.format(obj.image.url))
+                '<img src="{0}" width="150" height="150" style="object-fit:contain" />'.format(obj.images.filter(is_main=True).first().file.url))
         else:
             return 'Нет изображения'
 
@@ -65,3 +65,4 @@ admin.site.register(Product, ProductAdmin)
 admin.site.register(SubCategoryFilter)
 admin.site.register(Material)
 admin.site.register(Popular)
+admin.site.register(Banner)

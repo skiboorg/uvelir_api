@@ -59,12 +59,12 @@ def updateItems(file = None):
         # Если файл не передан, читаем из тестового файла
         with open('test.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
-        Category.objects.all().delete()
-        SizeFilter.objects.all().delete()
-        Material.objects.all().delete()
-        Coating.objects.all().delete()
-        Fineness.objects.all().delete()
-        SubCategory.objects.all().delete()
+        # Category.objects.all().delete()
+        # SizeFilter.objects.all().delete()
+        # Material.objects.all().delete()
+        # Coating.objects.all().delete()
+        # Fineness.objects.all().delete()
+        # SubCategory.objects.all().delete()
 
     categories = data.get('Categories', {})
     materials_obj = data.get('Materials', {})
@@ -127,6 +127,7 @@ def updateItems(file = None):
     for product in products:
         try:
             sizes = product.get('AvailableOptions', [])
+            anotherphoto = product.get('anotherphoto', [])
             subcategory = SubCategory.objects.filter(uid=product.get('FilterID'))
             subcategory_filter = SubCategoryFilter.objects.filter(uid=product.get('FilterID'))
             coating = Coating.objects.filter(uid=product.get('Сoating'))
@@ -144,13 +145,7 @@ def updateItems(file = None):
             if subcategory.exists():
                 subcategory_obj = subcategory.first()
 
-            if filename != 'NULL':
-                image_path = f'shop/product/images/{filename}'
-                try:
-                    image = process_image_to_webp(image_path)
-                    not_image = False
-                except:
-                    image = None
+
 
 
             new_product, _ = Product.objects.get_or_create(
@@ -162,10 +157,38 @@ def updateItems(file = None):
                 material=material.first() if material.exists() else None,
                 filter=subcategory_filter.first() if subcategory_filter.exists() else None,
                 is_active=False if not subcategory_obj else True,
-                name=product.get('Name'),
-                image=image,
-                not_image=not_image
+                name=product.get('Name')
             )
+            print(filename)
+            if filename != 'NULL':
+                image_path = f'shop/product/images/{filename}'
+                try:
+                    image = process_image_to_webp(image_path)
+                    ProductImage.objects.create(
+                        product=new_product,
+                        file=image,
+                        is_main=True
+                    )
+                    not_image = False
+                except:
+                    pass
+
+            for photo in anotherphoto:
+                print(photo)
+                try:
+                    image_path = f'shop/product/images/{photo}'
+                    image = process_image_to_webp(image_path)
+                    ProductImage.objects.create(
+                        product=new_product,
+                        file=image,
+                        is_main=False
+                    )
+                except:
+                    pass
+
+            new_product.not_image = not_image
+            new_product.save()
+
             # if len(sizes) == 0:
             #     new_product.is_active = False
             #     new_product.save()

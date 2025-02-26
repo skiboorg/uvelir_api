@@ -188,10 +188,11 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
 
-class Image(models.Model):
+class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=False,
                                 related_name='images')
     file = models.ImageField(upload_to='shop/product/images_fixed', blank=True, null=True)
+    is_main = models.BooleanField(default=False, null=False)
 
 
 class Size(models.Model):
@@ -236,3 +237,25 @@ class Popular(models.Model):
 class Favorite(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, blank=False)
     user = models.ForeignKey('user.User', on_delete=models.CASCADE, null=False, blank=False, related_name='favorites')
+
+
+class Banner(models.Model):
+    order_num = models.IntegerField(default=10)
+    image_big = ResizedImageField('Фон 1980х650', size=[1980, 650], quality=95, force_format='WEBP', upload_to='banner/images',
+                              blank=False, null=True)
+    image_small = ResizedImageField('Картинка 670х450', size=[670, 450], quality=95, force_format='WEBP',
+                                 upload_to='banner/images',
+                                 blank=False, null=True)
+    text_big = models.TextField('Текст большой', blank=True, null=True)
+    text_small = models.TextField('Текст маленький', blank=True, null=True)
+    button_text = models.CharField('Текст на кнопке',max_length=255, blank=True, null=False)
+    button_url = models.CharField('Ссылка на кнопке',max_length=255, blank=True, null=False)
+    def __str__(self):
+        return f'{self.order_num}'
+
+
+
+    class Meta:
+        verbose_name = 'Баннер'
+        verbose_name_plural = 'Баннеры'
+        ordering = ['order_num']

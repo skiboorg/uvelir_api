@@ -54,7 +54,10 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
     def get_image(self, obj):
-        return obj.images.filter(is_main=True).first().file.url
+        if obj.images.filter(is_main=True):
+            return obj.images.filter(is_main=True).first().file.url
+        else:
+            return None
     def get_cat_slug(self,obj):
         return obj.subcategory.category.slug
     def get_cat_name(self,obj):
@@ -114,7 +117,10 @@ class ProductShortSerializer(serializers.ModelSerializer):
                 'items_count'
                   ]
     def get_image(self, obj):
-        return obj.images.filter(is_main=True).first().file.url
+        if obj.images.filter(is_main=True):
+            return obj.images.filter(is_main=True).first().file.url
+        else:
+            return None
 
     def get_items_count(self, obj):
         return obj.sizes.aggregate(total=Sum('quantity'))['total']

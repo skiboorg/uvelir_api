@@ -226,7 +226,13 @@ class ProductSearchView(generics.ListAPIView):
         keywords = query.split()
 
         # Базовый запрос для поиска активных продуктов
-        products = Product.objects.filter(name_lower__icontains=query.lower(), is_active=True)
+        # products = Product.objects.filter(name_lower__icontains=query.lower(), is_active=True)
+        products = Product.objects.filter(
+            Q(name_lower__icontains=query.lower()) |
+            Q(article__icontains=query) |
+            Q(fineness__label__icontains=query),
+            is_active=True
+        )
         return products
 
 

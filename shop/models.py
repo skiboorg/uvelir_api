@@ -181,6 +181,12 @@ class Product(models.Model):
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
 
+    def get_product_url(self):
+        if self.subcategory:
+            return f"https://sh44.ru/catalog/{self.subcategory.category.slug}/{self.subcategory.slug}/{self.slug}"
+        else:
+            return f""
+
     def save(self, *args, **kwargs):
 
         self.slug = f'{slugify(self.name)}-{"".join(choices(string.ascii_lowercase + string.digits, k=8))}'

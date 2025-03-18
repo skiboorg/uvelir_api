@@ -25,7 +25,7 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, blank=True, null=True, related_name='items')
     product = models.ForeignKey('shop.Product', on_delete=models.CASCADE, blank=True, null=True)
     size = models.ForeignKey('shop.Size', on_delete=models.CASCADE, blank=True, null=True)
-    amount = models.DecimalField(default=0,decimal_places=2,max_digits=8, blank=True, null=True)
+    amount = models.IntegerField(default=0, blank=True, null=True)
 
     @property
     def total_price(self):

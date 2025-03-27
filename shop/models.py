@@ -187,6 +187,9 @@ class Product(models.Model):
         else:
             return f""
 
+    def have_image(self):
+        return self.images.count() > 0
+
     def save(self, *args, **kwargs):
 
         self.slug = f'{slugify(self.name)}-{"".join(choices(string.ascii_lowercase + string.digits, k=8))}'

@@ -1,6 +1,6 @@
 import json
 
-from django.db.models import Q
+from django.db.models import Q, Count
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
@@ -102,10 +102,11 @@ class GetSubCategory(generics.ListAPIView):
         if filter_values:
             queryset = queryset.filter(filter__slug__in=filter_values)
 
-        not_sort_queryset = list(queryset.distinct())
-        not_sort_queryset.sort(key=lambda x: (not bool(x.image), x.name))
+        # not_sort_queryset = list(queryset.distinct())
+        # not_sort_queryset.sort(key=lambda x: (not bool(x.have_image), x.name))
+        queryset = queryset.annotate(image_count=Count('images')).order_by('-image_count', 'name')
 
-        return not_sort_queryset #queryset.distinct()
+        return queryset #queryset.distinct()
 
     def get(self, request, *args, **kwargs):
         # Получаем стандартный пагинированный ответ

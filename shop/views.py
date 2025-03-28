@@ -56,12 +56,10 @@ class GetSubCategory(generics.ListAPIView):
         coating_value = self.request.query_params.get('coating')
         fineness_value = self.request.query_params.get('fineness')
         filter_values = self.request.query_params.getlist('filter')
-        price_from = self.request.query_params.get('price__gte',0)
-        price_to = self.request.query_params.get('price__lte',0)
-        print(size_values)
+        price_from = self.request.query_params.get('price__gte', 0)
+        price_to = self.request.query_params.get('price__lte', 0)
+        ordering = self.request.query_params.get('ordering')  # Параметр сортировки
 
-        filters = None
-        # Базовый queryset
         if subcategory_slug == 'all' and category_slug:
             category = Category.objects.filter(slug=category_slug).first()
             if category:
@@ -77,13 +75,10 @@ class GetSubCategory(generics.ListAPIView):
             if self.request.user.is_authenticated and self.request.user.is_opt_user:
                 queryset = Product.objects.filter(subcategory__slug=subcategory_slug, is_active=True)
             else:
-                queryset = Product.objects.filter(subcategory__slug=subcategory_slug, is_active=True,
-                                                  not_image=False)
+                queryset = Product.objects.filter(subcategory__slug=subcategory_slug, is_active=True, not_image=False)
 
         # Применение фильтров
         if size_values:
-            # Разбиваем строку значений на список
-            #size_values_list = size_values.split(',')
             queryset = queryset.filter(sizes__size__in=size_values)
 
         if coating_value:
@@ -91,8 +86,6 @@ class GetSubCategory(generics.ListAPIView):
 
         if fineness_value:
             queryset = queryset.filter(fineness__value=fineness_value)
-
-
 
         if price_from and price_to:
             queryset = queryset.filter(
@@ -102,11 +95,19 @@ class GetSubCategory(generics.ListAPIView):
         if filter_values:
             queryset = queryset.filter(filter__slug__in=filter_values)
 
-        # not_sort_queryset = list(queryset.distinct())
-        # not_sort_queryset.sort(key=lambda x: (not bool(x.have_image), x.name))
-        queryset = queryset.annotate(image_count=Count('images')).order_by('-image_count', 'name')
+        # Применение сортировки
+        if ordering:
+            if ordering in ['name', '-name']:
+                queryset = queryset.order_by(ordering)
+            elif ordering in ['sizes__price', '-sizes__price']:
+                queryset = queryset.annotate(avg_price=Avg('sizes__price'))
+                queryset = queryset.order_by(ordering.replace('sizes__price', 'avg_price'))
+        else:
+            queryset = queryset.annotate(image_count=Count('images'))
+            queryset = queryset.order_by('-image_count')  # Стандартная сортировка
 
-        return queryset #queryset.distinct()
+        return queryset
+
 
     def get(self, request, *args, **kwargs):
         # Получаем стандартный пагинированный ответ

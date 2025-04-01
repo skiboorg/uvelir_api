@@ -17,8 +17,8 @@ class ProductAdmin(NestedModelAdmin):
     model = Product
     inlines = [SizeInline,ImageInline]
     readonly_fields = ['image_preview']
-    list_filter = ['is_popular','is_active','null_opt_price','hidden_category']
-    search_fields = ('name','subcategory__name',)
+    list_filter = ['is_popular','is_active','null_opt_price','hidden_category','has_garniture']
+    search_fields = ('name','subcategory__name','uid')
 
     def product_url(self, obj):
         # Генерация URL и добавление кнопки для копирования

@@ -30,10 +30,12 @@ class Material(models.Model):
 class Fineness(models.Model):
     uid = models.CharField(max_length=255, blank=False, null=False)
     label = models.CharField('Название', max_length=255, blank=False, null=False)
+    label_lower = models.CharField('Название', max_length=255, blank=True, null=True)
     value = models.CharField('ЧПУ', max_length=255, blank=True, null=True)
     def save(self, *args, **kwargs):
 
         self.value = slugify(self.label)
+        self.label_lower = self.label.lower()
         super().save(*args, **kwargs)
     def __str__(self):
         return f'{self.label}'
@@ -149,8 +151,9 @@ class SubCategory(models.Model):
 
 
 class Product(models.Model):
-    uid = models.CharField(max_length=255, blank=False, null=False)
+    uid = models.CharField(max_length=255, blank=False, null=False, db_index=True)
     article = models.CharField('Артикул',max_length=100,blank=True, null=True)
+    article_lower = models.CharField('Артикул',max_length=100,blank=True, null=True)
     subcategory = models.ForeignKey(SubCategory,blank=True,null=True,on_delete=models.CASCADE, related_name='products')
     coating = models.ForeignKey(Coating,blank=True,null=True,on_delete=models.CASCADE, related_name='Покрытие')
     fineness = models.ForeignKey(Fineness,blank=True,null=True,on_delete=models.CASCADE, related_name='Вставка')
@@ -162,6 +165,7 @@ class Product(models.Model):
     is_in_stock = models.BooleanField('В наличии?', default=True, null=False)
     not_image = models.BooleanField(default=False, null=False)
     null_opt_price = models.BooleanField(default=False, null=False)
+    has_garniture = models.BooleanField(default=False, null=False)
     hidden_category = models.BooleanField(default=False, null=False)
     image = models.ImageField(upload_to='shop/product/images_fixed', blank=True, null=True)
 
@@ -173,6 +177,7 @@ class Product(models.Model):
     short_description = models.TextField('Короткое описание', blank=True, null=False)
     description = CKEditor5Field('Описание', blank=True, null=True, config_name='extends')
     items_count = models.IntegerField('Кол-во товаров', default=0, null=True)
+    garniture_set_uuids = models.TextField(blank=True, null=True)
     def __str__(self):
         return f'{self.name}'
 
@@ -194,6 +199,7 @@ class Product(models.Model):
 
         self.slug = f'{slugify(self.name)}-{"".join(choices(string.ascii_lowercase + string.digits, k=8))}'
         self.name_lower = self.name.lower()
+        self.article_lower = self.article.lower()
         super().save(*args, **kwargs)
 
 

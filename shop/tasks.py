@@ -116,11 +116,14 @@ def updateItems(file = None):
             label=coating.get('Name')
         )
 
+
     for gemstone in gemstones:
-        Fineness.objects.get_or_create(
+        obj, created = Fineness.objects.get_or_create(
             uid=gemstone.get('GemstoneID'),
             label=gemstone.get('Name')
         )
+        if not created:
+            obj.save()
 
     x = 0
 
@@ -132,8 +135,10 @@ def updateItems(file = None):
             subcategory_filter = SubCategoryFilter.objects.filter(uid=product.get('FilterID'))
             coating = Coating.objects.filter(uid=product.get('Сoating'))
             material = Material.objects.filter(uid=product.get('Materials'))
+
             fineness = Fineness.objects.filter(uid=product.get('Gemstones'))
             filename = product.get('FileName')
+            garniture_set = product.get('garniture_set',[])
             subcategory_obj = None
             image = None
             not_image = True
@@ -144,7 +149,6 @@ def updateItems(file = None):
 
             if subcategory.exists():
                 subcategory_obj = subcategory.first()
-
 
 
 
@@ -160,6 +164,9 @@ def updateItems(file = None):
                 name=product.get('Name')
             )
             print(filename)
+
+
+
             if filename != 'NULL':
                 image_path = f'shop/product/images/{filename}'
                 try:
@@ -187,6 +194,9 @@ def updateItems(file = None):
                     pass
 
             new_product.not_image = not_image
+            if len(garniture_set) > 0:
+                new_product.has_garniture = True
+            new_product.garniture_set_uuids = ','.join(garniture_set)
             new_product.save()
 
             # if len(sizes) == 0:

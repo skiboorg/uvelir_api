@@ -51,21 +51,20 @@ class OrderView(APIView):
                 price = item.size.price_opt
             else:
                 price = item.size.price
-            if item.size.quantity >= item.amount:
-                OrderItem.objects.create(
-                    order=new_order,
-                    article=item.product.article,
-                    image=item.product.image,
-                    name=item.product.name,
-                    avg_weight=item.size.avg_weight,
-                    amount=item.amount,
-                    price=price
-                )
-                item.delete()
-            else:
-                have_bad_items = True
 
-        result = {'success': True, 'message': new_order.id, 'have_bad_items':have_bad_items}
+            OrderItem.objects.create(
+                order=new_order,
+                article=item.product.article,
+                image=item.product.image,
+                name=item.product.name,
+                avg_weight=item.size.avg_weight,
+                amount=item.amount,
+                price=price
+            )
+            item.delete()
+
+
+        result = {'success': True, 'message': new_order.id}
 
         msg_html = render_to_string('order.html', {'order': new_order})
         send_mail('Новый заказ', None, 'noreply@sh44.ru', [new_order.email,'stepenina@mail.ru'],

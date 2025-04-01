@@ -167,6 +167,15 @@ class GetPopularProducts(generics.ListAPIView):
                 pass
         return products
 
+class GetRecomendedProducts(generics.ListAPIView):
+    serializer_class = ProductShortSerializer
+
+    def get_queryset(self):
+        product_id = self.request.query_params.get('product_id')
+        product = Product.objects.get(id=product_id)
+        products = Product.objects.filter(subcategory_id=product.subcategory_id,is_active=True).order_by('?')[:5]
+        return products
+
 
 class GetNewProducts(generics.ListAPIView):
     serializer_class = ProductShortSerializer
@@ -231,8 +240,8 @@ class ProductSearchView(generics.ListAPIView):
         # products = Product.objects.filter(name_lower__icontains=query.lower(), is_active=True)
         products = Product.objects.filter(
             Q(name_lower__icontains=query.lower()) |
-            Q(article__icontains=query) |
-            Q(fineness__label__icontains=query),
+            Q(article_lower__icontains=query) |
+            Q(fineness__label_lower__icontains=query),
             is_active=True
         )
         return products

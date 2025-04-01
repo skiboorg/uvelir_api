@@ -12,6 +12,7 @@ urlpatterns = [
     path('product/<slug>', views.GetProduct.as_view()),
     path('new', views.GetNewProducts.as_view()),
     path('popular', views.GetPopularProducts.as_view()),
+    path('recomended', views.GetRecomendedProducts.as_view()),
     path('updateitems', views.UpdateItems.as_view()),
 
     path('search', views.ProductSearchView.as_view()),

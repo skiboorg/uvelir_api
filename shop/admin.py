@@ -8,6 +8,7 @@ class SizeInline(NestedStackedInline):
     model = Size
     extra = 0
 
+
 class ImageInline(NestedStackedInline):
     model = ProductImage
     extra = 0
@@ -51,6 +52,10 @@ class SizeFilterInline(NestedStackedInline):
     model = SizeFilter
     extra = 0
 
+class SubcategorySizeFilterInline(NestedStackedInline):
+    model = SubcategorySizeFilter
+    extra = 0
+
 
 class CategoryAdmin(NestedModelAdmin):
     list_display = ('image_preview', 'name',)
@@ -72,8 +77,18 @@ class CategoryAdmin(NestedModelAdmin):
 class SubCategoryAdmin(NestedModelAdmin):
     list_display = ('name', 'category',)
     model = SubCategory
+    inlines = [SubcategorySizeFilterInline]
 
 
+class PromoItemInline(NestedStackedInline):
+    model = PromoItem
+    extra = 0
+
+
+class PromoAdmin(NestedModelAdmin):
+    list_display = ('name', )
+    model = Promo
+    inlines = [PromoItemInline]
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Fineness)
@@ -84,3 +99,4 @@ admin.site.register(SubCategoryFilter)
 admin.site.register(Material)
 admin.site.register(Popular)
 admin.site.register(Banner)
+admin.site.register(Promo, PromoAdmin)

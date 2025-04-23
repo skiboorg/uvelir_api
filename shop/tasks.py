@@ -10,7 +10,7 @@ from django.core.files.base import ContentFile
 import os
 from django.conf import settings
 
-def process_image_to_webp(file_path, output_size=(500, 500)):
+def process_image_to_webp(file_path, output_size=(800, 800)):
     """
     Уменьшает изображение до указанного размера, добавляет прозрачный фон и сохраняет в формате webp.
     :param file_path: Относительный путь к файлу внутри MEDIA_ROOT (например, "shop/product/images/123.jpg").

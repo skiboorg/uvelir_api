@@ -130,6 +130,7 @@ class SubCategory(models.Model):
     html_content = CKEditor5Field('SEO текст', blank=True, null=False)
     items_count = models.IntegerField('Кол-во товаров', default=0, null=True)
     is_active = models.BooleanField('Отображать?', default=True, null=False)
+    is_default = models.BooleanField('Открывать по-умолчанию?', default=False, null=False)
 
     def __str__(self):
         return f'{self.name}'
@@ -147,7 +148,15 @@ class SubCategory(models.Model):
         verbose_name = 'Подкатегория'
         verbose_name_plural = 'Подкатегории'
 
+class SubcategorySizeFilter(models.Model):
+    order_num = models.IntegerField(default=1, null=True)
+    product = models.ForeignKey(SubCategory, on_delete=models.CASCADE, null=True, blank=False,
+                                related_name='size_filters')
+    size = models.CharField('Размер', max_length=20, blank=True, null=True)
+    is_active = models.BooleanField('Отображать?', default=True, null=False)
 
+    class Meta:
+        ordering = ('order_num',)
 
 
 class Product(models.Model):
@@ -163,10 +172,12 @@ class Product(models.Model):
     is_popular = models.BooleanField('Популярный', default=False, null=False)
     is_active = models.BooleanField('Отображать?', default=True, null=False)
     is_in_stock = models.BooleanField('В наличии?', default=True, null=False)
+    sale = models.BooleanField('Распродажа',default=False, null=False)
     not_image = models.BooleanField(default=False, null=False)
     null_opt_price = models.BooleanField(default=False, null=False)
     has_garniture = models.BooleanField(default=False, null=False)
     hidden_category = models.BooleanField(default=False, null=False)
+
     image = models.ImageField(upload_to='shop/product/images_fixed', blank=True, null=True)
 
     name = models.CharField('Название', max_length=255, blank=False, null=True)
@@ -274,3 +285,27 @@ class Banner(models.Model):
         verbose_name = 'Баннер'
         verbose_name_plural = 'Баннеры'
         ordering = ['order_num']
+
+
+class Promo(models.Model):
+    order_num = models.IntegerField(default=10)
+    image = models.FileField(upload_to='shop/promo/', blank=True, null=True)
+    col_span = models.IntegerField(default=12)
+    name = models.CharField(max_length=255, blank=True, null=False)
+    description = CKEditor5Field('Описание', blank=True, null=True, config_name='extends')
+    def __str__(self):
+        return f'{self.order_num}'
+
+
+
+    class Meta:
+        verbose_name = 'Акция'
+        verbose_name_plural = 'Акции'
+        ordering = ['order_num']
+
+class PromoItem(models.Model):
+    promo = models.ForeignKey(Promo, on_delete=models.CASCADE, null=False, blank=False, related_name='items')
+    uid = models.CharField(max_length=255, blank=False, null=False)
+
+    def __str__(self):
+        return f'{self.uid}'

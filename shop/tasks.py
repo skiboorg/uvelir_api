@@ -19,7 +19,7 @@ def process_image_to_webp(file_path, output_size=(800, 800)):
     """
     # Абсолютный путь к файлу
     absolute_path = os.path.join(settings.MEDIA_ROOT, file_path)
-    print(absolute_path)
+    # print(absolute_path)
     # Открываем исходное изображение
     with Image.open(absolute_path) as img:
         # Преобразуем изображение в RGBA для работы с прозрачностью
@@ -159,11 +159,12 @@ def updateItems(file = None):
                 coating=coating.first() if coating.exists() else None,
                 fineness=fineness.first() if fineness.exists() else None,
                 material=material.first() if material.exists() else None,
+                sale=False,
                 filter=subcategory_filter.first() if subcategory_filter.exists() else None,
                 is_active=False if not subcategory_obj else True,
                 name=product.get('Name')
             )
-            print(filename)
+            # print(filename)
 
 
 
@@ -181,7 +182,7 @@ def updateItems(file = None):
                     pass
 
             for photo in anotherphoto:
-                print(photo)
+                # print(photo)
                 try:
                     image_path = f'shop/product/images/{photo}'
                     image = process_image_to_webp(image_path)
@@ -213,8 +214,8 @@ def updateItems(file = None):
                 price_key = size.get('RetailPrice')
                 price_opt_key = size.get('WholesalePrice')
 
-                print('price_key',price_key)
-                print('price_opt_key',price_opt_key)
+                # print('price_key',price_key)
+                # print('price_opt_key',price_opt_key)
 
                 if price_key == '':
                     price = 0
@@ -260,8 +261,8 @@ def updateItems(file = None):
 
             x += 1
         except Exception as e:
-            print(e)
-            print(product)
+            print('products', e)
+            # print(product)
     all_sizes = Size.objects.all()
     print('check sizes')
     for size in all_sizes:
@@ -275,7 +276,7 @@ def updateItems(file = None):
             size.price= price
             size.save()
         except Exception as e:
-            print(e)
+            print('check sizes',e)
     print('check categories')
     for product in Product.objects.all():
         try:
@@ -283,5 +284,5 @@ def updateItems(file = None):
                 product.hidden_category = True
                 product.save()
         except Exception as e:
-            print(e)
+            print('check categories',e)
     return

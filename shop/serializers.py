@@ -26,10 +26,8 @@ class SizeSerializer(serializers.ModelSerializer):
         model = Size
         fields = '__all__'
 
-class SubCategoryFilterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SubCategoryFilter
-        fields = '__all__'
+
+
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
@@ -163,10 +161,19 @@ class ProductSerializer(serializers.ModelSerializer):
         # Сериализуем найденные товары
         return ProductShortSerializer(products, many=True, context=self.context).data
 
+class SubCategoryFilterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubCategoryFilter
+        fields = '__all__'
 
+class SubcategorySizeFilterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubcategorySizeFilter
+        fields = '__all__'
 
 class SubCategorySerializer(serializers.ModelSerializer):
     #products = ProductSerializer(many=True, required=False, read_only=True)
+    size_filters = SubCategoryFilterSerializer(many=True, required=False, read_only=True)
     products = serializers.SerializerMethodField()
     class Meta:
         model = SubCategory

@@ -114,14 +114,17 @@ class GetSubCategory(generics.ListAPIView):
         response = super().get(request, *args, **kwargs)
 
         subcategory_slug = self.kwargs.get('subcategory_slug')
-
+        print('subcategory_slug',subcategory_slug)
         if subcategory_slug != 'all':
             subcategory = SubCategory.objects.get(slug=subcategory_slug)
             print('subcategory', subcategory)
             filters = subcategory.filters.all()
+            size_filters = subcategory.size_filters.all()
 
             filters_serializer = SubCategoryFilterSerializer(filters, many=True)
+            sizes_serializer = SubcategorySizeFilterSerializer(size_filters, many=True)
             response.data['filters'] = filters_serializer.data
+            response.data['sizes'] = sizes_serializer.data
         else:
             response.data['filters'] = []
         return Response(response.data)

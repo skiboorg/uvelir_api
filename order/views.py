@@ -59,7 +59,8 @@ class OrderView(APIView):
                 name=item.product.name,
                 avg_weight=item.size.avg_weight,
                 amount=item.amount,
-                price=price
+                price=price,
+                size=item.size.size,
             )
             item.delete()
 
@@ -69,6 +70,7 @@ class OrderView(APIView):
         msg_html = render_to_string('order.html', {'order': new_order})
         send_mail('Новый заказ', None, 'noreply@sh44.ru', [new_order.email,'stepenina@mail.ru'],
                   fail_silently=False, html_message=msg_html)
+
         return Response(result, status=200)
 
 

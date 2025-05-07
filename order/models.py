@@ -87,6 +87,7 @@ class OrderItem(models.Model):
     avg_weight = models.DecimalField('Средний вес', decimal_places=4, max_digits=8, blank=True, null=True)
     amount = models.IntegerField(default=0, blank=True, null=True)
     price = models.DecimalField('Цена', decimal_places=2, max_digits=8, blank=True, null=True)
+    size = models.CharField('Размер', max_length=20, blank=True, null=True)
 
     @property
     def total_price(self):

@@ -46,6 +46,7 @@ class ProductShortSerializer(serializers.ModelSerializer):
     coating = CoatingSerializer(many=False, required=False, read_only=True)
     fineness = FinenessSerializer(many=False, required=False, read_only=True)
     material = MaterialSerializer(many=False, required=False, read_only=True)
+    images = ProductImageSerializer(many=True, required=False, read_only=True)
     class Meta:
         model = Product
         fields = [
@@ -69,7 +70,8 @@ class ProductShortSerializer(serializers.ModelSerializer):
               'min_price_opt',
               'avg_weight',
                 'items_count',
-                'has_garniture'
+                'has_garniture',
+            'images'
                   ]
     def get_image(self, obj):
         if obj.images.filter(is_main=True):

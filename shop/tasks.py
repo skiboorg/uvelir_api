@@ -245,15 +245,19 @@ def updateItems(file = None):
                     size_obj.avg_weight = (size_obj.min_weight + size_obj.max_weight) / 2
                     size_obj.save()
                 else:
+                    min_weight = Decimal(size.get('WeightMin'))
+                    max_weight = Decimal(size.get('WeightMax'))
+                    avg_weight = (min_weight + max_weight) / 2
+
                     new_size = Size.objects.create(
                         product=new_product,
                         size=size.get('Size'),
                         quantity=int(size.get('Quantity', 0)),
                         price=price,
                         price_opt=price_opt,
-                        min_weight=round(Decimal(size.get('WeightMin')),2),
-                        max_weight=round(Decimal(size.get('WeightMax')),2),
-                        avg_weight=round((Decimal(size.get('WeightMin')) + Decimal(size.get('WeightMax')) / 2),2)
+                        min_weight=round(min_weight,2),
+                        max_weight=round(max_weight,2),
+                        avg_weight=round(avg_weight,2)
                     )
                     if new_size.quantity == 0:
                         new_product.is_active = False

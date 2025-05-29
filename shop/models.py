@@ -228,7 +228,9 @@ class Size(models.Model):
     size = models.CharField('Размер', max_length=20, blank=True, null=True)
     quantity = models.IntegerField('Остаток', blank=True, null=True)
     price = models.DecimalField('Цена', default=0, decimal_places=2, max_digits=7, blank=True, null=True)
+    price_init = models.DecimalField('Цена исходная', default=0, decimal_places=2, max_digits=7, blank=True, null=True)
     price_opt = models.DecimalField('Цена оптовая', default=0, decimal_places=2, max_digits=7, blank=True, null=True)
+    price_opt_init = models.DecimalField('Цена оптовая исходная', default=0, decimal_places=2, max_digits=7, blank=True, null=True)
 
     min_weight = models.DecimalField('Минимальный вес', decimal_places=4, max_digits=8, blank=True, null=True)
     max_weight = models.DecimalField('Максимальный вес', decimal_places=4, max_digits=8, blank=True, null=True)

@@ -244,6 +244,17 @@ def updateItems(file = None):
 
                     size_obj.avg_weight = (size_obj.min_weight + size_obj.max_weight) / 2
                     size_obj.save()
+
+                    size = size_obj
+
+                    if size.price_opt == 0:
+                        size.product.null_opt_price = True
+                        size.product.save()
+                    price_opt = math.ceil(size.price_opt * size.max_weight)
+                    price = math.trunc((price_opt * Decimal(2)) / 10) * 10
+                    size.price_opt = price_opt
+                    size.price = price
+                    size.save()
                 else:
                     min_weight = Decimal(size.get('WeightMin'))
                     max_weight = Decimal(size.get('WeightMax'))
@@ -262,25 +273,36 @@ def updateItems(file = None):
                     if new_size.quantity == 0:
                         new_product.is_active = False
                         new_product.save()
+                   #added
+                    size = new_size
 
+                    if size.price_opt == 0:
+                        size.product.null_opt_price = True
+                        size.product.save()
+                    price_opt = math.ceil(size.price_opt * size.max_weight)
+                    price = math.trunc((price_opt * Decimal(2)) / 10) * 10
+                    size.price_opt = price_opt
+                    size.price = price
+                    size.save()
+                # added
             x += 1
         except Exception as e:
             print('products', e)
             # print(product)
-    all_sizes = Size.objects.all()
-    print('check sizes')
-    for size in all_sizes:
-        try:
-            if size.price_opt == 0:
-                size.product.null_opt_price = True
-                size.product.save()
-            price_opt = math.ceil(size.price_opt * size.max_weight)
-            price = math.trunc((price_opt * Decimal(2)) / 10 ) * 10
-            size.price_opt = price_opt
-            size.price= price
-            size.save()
-        except Exception as e:
-            print('check sizes',e)
+    #all_sizes = Size.objects.all()
+    # print('check sizes')
+    # for size in all_sizes:
+    #     try:
+    #         if size.price_opt == 0:
+    #             size.product.null_opt_price = True
+    #             size.product.save()
+    #         price_opt = math.ceil(size.price_opt * size.max_weight)
+    #         price = math.trunc((price_opt * Decimal(2)) / 10 ) * 10
+    #         size.price_opt = price_opt
+    #         size.price= price
+    #         size.save()
+    #     except Exception as e:
+    #         print('check sizes',e)
     print('check categories')
     for product in Product.objects.all():
         try:

@@ -62,13 +62,14 @@ class Order(models.Model):
     comment = models.TextField('Коментарий', blank=True, null=True)
 
     def __str__(self):
-        return f'{self.order_id}'
+        return f'{self.order_id} - {self.total_price}'
 
     @property
     def total_price(self):
         result = Decimal(0)
         for item in self.items.all():
-            result += item.price
+            amount = item.amount if item.amount else 0
+            result += item.price * Decimal(amount)
         print(result)
         return result
     class Meta:

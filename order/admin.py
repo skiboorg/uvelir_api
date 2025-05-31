@@ -7,7 +7,7 @@ class OrderItemInline(NestedStackedInline):
     extra = 0
 
 class OrderAdmin(NestedModelAdmin):
-    list_display = ('id','user__fio','user__email', 'is_paid','is_done','is_deliveried','created_at',)
+    list_display = ('id','user__fio','user__email', 'is_paid','is_done','is_deliveried','created_at','total_price',)
     model = Order
     inlines = [OrderItemInline]
     list_filter = ('is_paid','is_done','is_deliveried',)

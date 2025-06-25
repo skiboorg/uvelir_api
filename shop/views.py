@@ -56,8 +56,8 @@ class GetSubCategory(generics.ListAPIView):
         coating_value = self.request.query_params.get('coating')
         fineness_value = self.request.query_params.get('fineness')
         filter_values = self.request.query_params.getlist('filter')
-        price_from = self.request.query_params.get('price__gte', 0)
-        price_to = self.request.query_params.get('price__lte', 0)
+        price_from = self.request.query_params.get('price__gte', None)
+        price_to = self.request.query_params.get('price__lte', None)
         ordering = self.request.query_params.get('ordering')  # Параметр сортировки
 
         if subcategory_slug == 'all' and category_slug:
@@ -66,14 +66,14 @@ class GetSubCategory(generics.ListAPIView):
                 subcategories = SubCategory.objects.filter(category=category)
 
                 if self.request.user.is_authenticated and self.request.user.is_opt_user:
-                    queryset = Product.objects.filter(subcategory__in=subcategories, is_active=True)
+                    queryset = Product.objects.filter(subcategory__in=subcategories)
                 else:
                     queryset = Product.objects.filter(subcategory__in=subcategories, null_opt_price=False,  is_active=True, not_image=False)
             else:
                 return Product.objects.none()
         else:
             if self.request.user.is_authenticated and self.request.user.is_opt_user:
-                queryset = Product.objects.filter(subcategory__slug=subcategory_slug, is_active=True)
+                queryset = Product.objects.filter(subcategory__slug=subcategory_slug)
             else:
                 queryset = Product.objects.filter(subcategory__slug=subcategory_slug, null_opt_price=False, is_active=True, not_image=False)
 
@@ -87,10 +87,22 @@ class GetSubCategory(generics.ListAPIView):
         if fineness_value:
             queryset = queryset.filter(fineness__value=fineness_value)
 
+        print('ewre', price_from, price_to)
+
         if price_from and price_to:
             queryset = queryset.filter(
-                Q(sizes__price__gte=price_from) & Q(sizes__price__lte=price_to)
+                sizes__price__gte=price_from,
+                sizes__price__lte=price_to
             )
+        elif price_from:
+            queryset = queryset.filter(
+                sizes__price__gte=price_from
+            )
+        elif price_to:
+            queryset = queryset.filter(
+                sizes__price__lte=price_to
+            )
+
 
         if filter_values:
             queryset = queryset.filter(filter__slug__in=filter_values)
@@ -241,6 +253,15 @@ class ProductSearchView(generics.ListAPIView):
 
         # Базовый запрос для поиска активных продуктов
         # products = Product.objects.filter(name_lower__icontains=query.lower(), is_active=True)
+
+        if self.request.user.is_authenticated and self.request.user.is_opt_user:
+            products = Product.objects.filter(
+                Q(name_lower__icontains=query.lower()) |
+                Q(article_lower__icontains=query) |
+                Q(fineness__label_lower__icontains=query)
+            )
+            return products
+
         products = Product.objects.filter(
             Q(name_lower__icontains=query.lower()) |
             Q(article_lower__icontains=query) |

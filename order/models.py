@@ -2,6 +2,8 @@ from django.db import models
 from decimal import Decimal
 from django_resized import ResizedImageField
 
+from django.utils.html import format_html
+
 
 class Status(models.Model):
     name = models.CharField('Название',max_length=255)
@@ -83,12 +85,17 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True, null=True, related_name='items')
     article = models.CharField('Артикул', max_length=20, blank=True, null=True)
-    image = models.FileField(upload_to='order/images', blank=False, null=True)
+    image = models.FileField(upload_to='order/images', blank=True, null=True)
     name = models.CharField('Название', max_length=255, blank=False, null=True)
     avg_weight = models.DecimalField('Средний вес', decimal_places=4, max_digits=8, blank=True, null=True)
     amount = models.IntegerField(default=0, blank=True, null=True)
     price = models.DecimalField('Цена', decimal_places=2, max_digits=8, blank=True, null=True)
     size = models.CharField('Размер', max_length=20, blank=True, null=True)
+
+    def image_preview(self):
+        if self.image:
+            return format_html('<img src="{}" width="100" height="100" style="object-fit:contain;" />', self.image.url)
+        return "Нет изображения"
 
     @property
     def total_price(self):

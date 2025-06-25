@@ -272,9 +272,9 @@ def updateItems(file = None):
                         max_weight=round(max_weight,2),
                         avg_weight=round(avg_weight,2)
                     )
-                    if new_size.quantity == 0:
-                        new_product.is_active = False
-                        new_product.save()
+                    # if new_size.quantity == 0:
+                    #     new_product.is_active = False
+                    #     new_product.save()
                    #added
                     size = new_size
 
@@ -287,6 +287,15 @@ def updateItems(file = None):
                     size.price = price
                     size.save()
                 # added
+
+            quantity = 0
+            for size in product.sizes.all():
+                quantity += size.quantity
+
+            if quantity == 0:
+                product.is_active = False
+                product.save()
+
             x += 1
         except Exception as e:
             print('products', e)

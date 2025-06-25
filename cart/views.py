@@ -15,6 +15,10 @@ def get_cart(request) -> Cart:
         cart, _ = Cart.objects.get_or_create(session_uuid=session_id)
     return cart
 
+class CartDel(APIView):
+    def get(self, request):
+        Cart.objects.filter(user__isnull=True).delete()
+        return Response(status=200)
 class CartView(APIView):
     def get(self, request):
         cart = get_cart(request)

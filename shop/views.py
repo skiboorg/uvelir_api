@@ -58,6 +58,7 @@ class GetSubCategory(generics.ListAPIView):
         filter_values = self.request.query_params.getlist('filter')
         price_from = self.request.query_params.get('price__gte', None)
         price_to = self.request.query_params.get('price__lte', None)
+        is_in_stock = self.request.query_params.get('is_in_stock', '')
         ordering = self.request.query_params.get('ordering')  # Параметр сортировки
 
         if subcategory_slug == 'all' and category_slug:
@@ -117,6 +118,8 @@ class GetSubCategory(generics.ListAPIView):
         else:
             queryset = queryset.annotate(image_count=Count('images'))
             queryset = queryset.order_by('-image_count')  # Стандартная сортировка
+        if is_in_stock == 'true':
+            queryset = queryset.filter(is_in_stock=True)
 
         return queryset
 
@@ -242,8 +245,29 @@ class FavoriteView(APIView):
 
         return Response({'message':message}, status=200)
 
-
 class ProductSearchView(generics.ListAPIView):
+    pagination_class = StandardResultsSetPagination
+    serializer_class = ProductShortSerializer
+
+    def get_queryset(self):
+        query = self.request.GET.get('q', '')  # Получаем значение параметра "q" из GET-запроса
+        query_lower = query.lower()
+
+        base_filter = Q(name_lower__icontains=query_lower) | Q(article_lower__icontains=query) | Q(fineness__label_lower__icontains=query)
+
+        # Фильтрация по пользователю
+        if self.request.user.is_authenticated and self.request.user.is_opt_user:
+            qs = Product.objects.filter(base_filter)
+        else:
+            qs = Product.objects.filter(base_filter, is_active=True)
+
+        # Аннотация количества изображений и сортировка сначала с фото
+        qs = qs.annotate(image_count=Count('images')).order_by('-image_count')
+
+        return qs
+
+
+class ProductSearchViewOld(generics.ListAPIView):
     pagination_class = StandardResultsSetPagination
     serializer_class = ProductShortSerializer
 

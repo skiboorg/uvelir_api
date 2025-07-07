@@ -30,6 +30,7 @@ def process_image_to_webp(file_path, output_size=(1000, 1000)):
 
         # Масштабируем изображение с сохранением пропорций
         img.thumbnail(output_size, Image.Resampling.LANCZOS)
+        img = ImageOps.fit(img, output_size, Image.Resampling.LANCZOS)
 
         # Вычисляем координаты для вставки изображения по центру
         x_offset = (output_size[0] - img.width) // 2

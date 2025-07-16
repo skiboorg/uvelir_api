@@ -43,65 +43,59 @@ class ProductShortSerializer(serializers.ModelSerializer):
     avg_weight = serializers.SerializerMethodField()
     items_count = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
+
     coating = CoatingSerializer(many=False, required=False, read_only=True)
     fineness = FinenessSerializer(many=False, required=False, read_only=True)
     material = MaterialSerializer(many=False, required=False, read_only=True)
     images = ProductImageSerializer(many=True, required=False, read_only=True)
+
     class Meta:
         model = Product
         fields = [
-            'id',
-            'name',
-              'slug',
-              'image',
-              'cat_slug',
-              'subcat_name',
-              'subcat_slug',
-              'subcat_text',
-              'is_new',
-              'article',
-              'is_popular',
-              'is_active',
-              'is_in_stock',
-              'coating',
-              'fineness',
-              'material',
-              'min_price',
-              'min_price_opt',
-              'avg_weight',
-                'items_count',
-                'has_garniture',
-            'images'
-                  ]
+            'id', 'name', 'slug', 'image',
+            'cat_slug', 'subcat_name', 'subcat_slug', 'subcat_text',
+            'is_new', 'article', 'is_popular', 'is_active', 'is_in_stock',
+            'coating', 'fineness', 'material',
+            'min_price', 'min_price_opt', 'avg_weight',
+            'items_count', 'has_garniture', 'images'
+        ]
+
     def get_image(self, obj):
-        if obj.images.filter(is_main=True):
-            return obj.images.filter(is_main=True).first().file.url
-        else:
-            return None
+        main_image = obj.images.filter(is_main=True).first()
+        return main_image.file.url if main_image else None
 
     def get_items_count(self, obj):
         return obj.sizes.aggregate(total=Sum('quantity'))['total']
 
-
     def get_min_price(self, obj):
-        # Получаем минимальное значение price из связанных объектов Size
         return obj.sizes.aggregate(min_price=Min('price'))['min_price']
 
     def get_min_price_opt(self, obj):
-        # Получаем минимальное значение price из связанных объектов Size
         return obj.sizes.aggregate(min_price=Min('price_opt'))['min_price']
 
     def get_avg_weight(self, obj):
-        # Получаем среднее значение avg_weight из связанных объектов Size
         return obj.sizes.aggregate(avg_weight=Avg('avg_weight'))['avg_weight']
-    def get_cat_slug(self,obj):
-        return obj.subcategory.category.slug
-    def get_subcat_slug(self,obj):
-        return obj.subcategory.slug
-    def get_subcat_name(self,obj):
-        return obj.subcategory.name
-    def get_subcat_text(self,obj):
-        return obj.subcategory.short_description
+
+    def get_cat_slug(self, obj):
+        if obj.subcategory and obj.subcategory.category:
+            return obj.subcategory.category.slug
+        return None
+
+    def get_subcat_slug(self, obj):
+        if obj.subcategory:
+            return obj.subcategory.slug
+        return None
+
+    def get_subcat_name(self, obj):
+        if obj.subcategory:
+            return obj.subcategory.name
+        return None
+
+    def get_subcat_text(self, obj):
+        if obj.subcategory:
+            return obj.subcategory.short_description
+        return None
+
 
 class ProductSerializer(serializers.ModelSerializer):
     sizes = SizeSerializer(many=True,required=False,read_only=True)

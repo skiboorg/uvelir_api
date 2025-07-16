@@ -198,19 +198,30 @@ class Product(models.Model):
         verbose_name_plural = 'Товары'
 
     def get_product_url(self):
-        if self.subcategory:
-            return f"https://sh44.ru/catalog/{self.subcategory.category.slug}/{self.subcategory.slug}/{self.slug}"
-        else:
-            return f""
+        category = getattr(self.subcategory, 'category', None)
+        if self.subcategory and category:
+            return f"https://sh44.ru/catalog/{category.slug}/{self.subcategory.slug}/{self.slug}"
+        return ""
 
     def have_image(self):
         return self.images.count() > 0
 
     def save(self, *args, **kwargs):
+        base_slug = slugify(self.name) if self.name else ''
+        if not self.slug:
+            self.slug = base_slug
 
-        self.slug = f'{slugify(self.name)}-{"".join(choices(string.ascii_lowercase + string.digits, k=8))}'
-        self.name_lower = self.name.lower()
-        self.article_lower = self.article.lower()
+        # Проверяем наличие других товаров с таким же slug
+        qs = Product.objects.filter(slug=self.slug)
+        if self.pk:
+            qs = qs.exclude(pk=self.pk)  # исключаем текущий объект, если редактируется
+
+        if qs.exists():
+            # Если такой slug уже есть, добавляем случайный суффикс
+            self.slug = f'{base_slug}-{"".join(choices(string.ascii_lowercase + string.digits, k=8))}'
+
+        self.name_lower = self.name.lower() if self.name else ''
+        self.article_lower = self.article.lower() if self.article else ''
         super().save(*args, **kwargs)
 
 

@@ -207,15 +207,12 @@ class Product(models.Model):
         return self.images.count() > 0
 
     def save(self, *args, **kwargs):
-        base_slug = slugify(self.name) if self.name else ''
+        base_slug = slugify(self.name)
         if not self.slug:
             self.slug = base_slug
 
         # Проверяем наличие других товаров с таким же slug
-        qs = Product.objects.filter(slug=self.slug)
-        if self.pk:
-            qs = qs.exclude(pk=self.pk)  # исключаем текущий объект, если редактируется
-
+        qs = Product.objects.filter(slug=base_slug)
         if qs.exists():
             # Если такой slug уже есть, добавляем случайный суффикс
             self.slug = f'{base_slug}-{"".join(choices(string.ascii_lowercase + string.digits, k=8))}'

@@ -84,9 +84,12 @@ def updateItems(file = None):
         subcategories = category.get('Elements', [])
         new_category, created = Category.objects.get_or_create(uid=category_uuid, name=category_name)
 
-        if created:
+        if 'не выгружать' in category_name.lower():
             new_category.is_active = False
-            new_category.save()
+        elif created:
+            new_category.is_active = False
+
+        new_category.save()
 
         for subcategory in subcategories:
             subcategory_uuid = subcategory.get('SubcategoryID')
@@ -290,12 +293,13 @@ def updateItems(file = None):
                 # added
 
             quantity = 0
-            for size in product.sizes.all():
+            for size in new_product.sizes.all():
                 quantity += size.quantity
 
             if quantity == 0:
-                product.is_active = False
-                product.save()
+                new_product.is_active = False
+                new_product.is_in_stock = False
+                new_product.save()
 
             x += 1
         except Exception as e:

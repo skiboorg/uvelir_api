@@ -1,4 +1,5 @@
 import json
+from unicodedata import category
 
 from django.db.models import Q, Count
 from rest_framework.response import Response
@@ -253,13 +254,23 @@ class ProductSearchView(generics.ListAPIView):
         query = self.request.GET.get('q', '')  # Получаем значение параметра "q" из GET-запроса
         query_lower = query.lower()
 
-        base_filter = Q(name_lower__icontains=query_lower) | Q(article_lower__icontains=query) | Q(fineness__label_lower__icontains=query)
+        text_filter = (
+                Q(name_lower__icontains=query_lower) |
+                Q(article_lower__icontains=query) |
+                Q(fineness__label_lower__icontains=query_lower)
+        )
+
+        base_filter = Q(subcategory__category__is_active=True) & text_filter
 
         # Фильтрация по пользователю
         if self.request.user.is_authenticated and self.request.user.is_opt_user:
             qs = Product.objects.filter(base_filter)
         else:
             qs = Product.objects.filter(base_filter, is_active=True)
+
+        print(qs)
+        for product in qs:
+            print(product.subcategory.category.is_active)
 
         # Аннотация количества изображений и сортировка сначала с фото
         qs = qs.annotate(image_count=Count('images')).order_by('-image_count')

@@ -3,6 +3,7 @@ from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 from django.utils.safestring import mark_safe
 from .models import *
 from django.utils.html import format_html
+from django.db.models import Sum
 
 class SizeInline(NestedStackedInline):
     model = Size
@@ -13,13 +14,25 @@ class ImageInline(NestedStackedInline):
     model = ProductImage
     extra = 0
 
+
 class ProductAdmin(NestedModelAdmin):
-    list_display = ('image_preview','article','name','product_url','subcategory','filter','is_new','is_popular','is_active',)
+    list_display = ('image_preview','article','name','total_quantity','has_garniture','product_url','subcategory','filter','is_new','is_popular','is_active',)
     model = Product
     inlines = [SizeInline,ImageInline]
     readonly_fields = ['image_preview']
     list_filter = ['is_popular','is_active','null_opt_price','hidden_category','has_garniture']
     search_fields = ('name','subcategory__name','uid')
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(total_quantity_sum=Sum('sizes__quantity'))
+
+    def total_quantity(self, obj):
+        return obj.total_quantity_sum or 0  # Показываем 0, если None
+
+    total_quantity.admin_order_field = 'total_quantity_sum'
+
+    total_quantity.short_description = 'Остаток'
 
     def product_url(self, obj):
         # Генерация URL и добавление кнопки для копирования

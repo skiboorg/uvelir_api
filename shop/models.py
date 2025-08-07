@@ -175,7 +175,7 @@ class Product(models.Model):
     sale = models.BooleanField('Распродажа',default=False, null=False)
     not_image = models.BooleanField(default=False, null=False)
     null_opt_price = models.BooleanField(default=False, null=False)
-    has_garniture = models.BooleanField(default=False, null=False)
+    has_garniture = models.BooleanField('Гарнитур',default=False, null=False)
     hidden_category = models.BooleanField(default=False, null=False)
 
     image = models.ImageField(upload_to='shop/product/images_fixed', blank=True, null=True)
@@ -184,7 +184,7 @@ class Product(models.Model):
     name_lower = models.CharField('Название', max_length=255, blank=True, null=True, editable=False)
     slug = models.CharField('ЧПУ',max_length=255,
                             help_text='Если не заполнено, создается на основе поля Назавание',
-                            blank=True, null=True, editable=False)
+                            blank=True, null=True)
     short_description = models.TextField('Короткое описание', blank=True, null=False)
     description = CKEditor5Field('Описание', blank=True, null=True, config_name='extends')
     items_count = models.IntegerField('Кол-во товаров', default=0, null=True)
@@ -207,15 +207,7 @@ class Product(models.Model):
         return self.images.count() > 0
 
     def save(self, *args, **kwargs):
-        base_slug = slugify(self.name)
-        if not self.slug:
-            self.slug = base_slug
-
-        # Проверяем наличие других товаров с таким же slug
-        qs = Product.objects.filter(slug=base_slug)
-        if qs.exists():
-            # Если такой slug уже есть, добавляем случайный суффикс
-            self.slug = f'{base_slug}-{"".join(choices(string.ascii_lowercase + string.digits, k=8))}'
+        self.slug = slugify(self.name)
 
         self.name_lower = self.name.lower() if self.name else ''
         self.article_lower = self.article.lower() if self.article else ''

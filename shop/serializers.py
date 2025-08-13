@@ -52,7 +52,7 @@ class ProductShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'id', 'name', 'slug', 'image',
+            'id','uid', 'name', 'slug', 'image',
             'cat_slug', 'subcat_name', 'subcat_slug', 'subcat_text',
             'is_new', 'article', 'is_popular', 'is_active', 'is_in_stock',
             'coating', 'fineness', 'material',
@@ -236,3 +236,15 @@ class FavoriteSerializer(serializers.ModelSerializer):
         model = Favorite
         fields = '__all__'
 
+
+
+class SelectionItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SelectionItem
+        fields = '__all__'
+
+class SelectionSerializer(serializers.ModelSerializer):
+    items = SelectionItemSerializer(many=True, read_only=True)
+    class Meta:
+        model = Selection
+        fields = '__all__'

@@ -18,4 +18,5 @@ urlpatterns = [
     path('search', views.ProductSearchView.as_view()),
     path('fav', views.FavoriteView.as_view()),
     path('banners', views.GetBanners.as_view()),
+    path('selection', views.SelectionAPIView.as_view()),
 ]

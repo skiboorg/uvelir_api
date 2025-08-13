@@ -103,6 +103,15 @@ class PromoAdmin(NestedModelAdmin):
     model = Promo
     inlines = [PromoItemInline]
 
+class SelectionItemInline(NestedStackedInline):
+    model = SelectionItem
+    extra = 0
+
+class SelectionAdmin(NestedModelAdmin):
+    list_display = ('name', )
+    model = Selection
+    inlines = [SelectionItemInline]
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Fineness)
 admin.site.register(Coating)
@@ -113,3 +122,4 @@ admin.site.register(Material)
 admin.site.register(Popular)
 admin.site.register(Banner)
 admin.site.register(Promo, PromoAdmin)
+admin.site.register(Selection, SelectionAdmin)

@@ -40,6 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'orders',
             'is_opt_user',
+            'is_staff',
             'favorites'
 
         ]

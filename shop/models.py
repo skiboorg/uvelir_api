@@ -311,3 +311,18 @@ class PromoItem(models.Model):
 
     def __str__(self):
         return f'{self.uid}'
+
+
+class Selection(models.Model):
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE, null=True, blank=True, related_name='selections')
+    image = ResizedImageField('Картинка 670х450', size=[670, 450], quality=95, force_format='WEBP',
+                                    upload_to='banner/images',
+                                    blank=True, null=True)
+    name = models.CharField(max_length=255, blank=False, null=True)
+    promo = models.CharField(max_length=255, blank=False, null=True)
+    created_at = models.DateField(auto_now_add=True)
+    is_sale = models.BooleanField(default=False, null=False)
+
+class SelectionItem(models.Model):
+    uid = models.CharField(max_length=255, blank=True, null=True)
+    selection = models.ForeignKey(Selection, on_delete=models.CASCADE, null=True, blank=True, related_name='items')

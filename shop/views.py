@@ -310,3 +310,23 @@ class ProductSearchViewOld(generics.ListAPIView):
 class GetBanners(generics.ListAPIView):
     queryset = Banner.objects.all()
     serializer_class = BannerSerializer
+
+
+class SelectionAPIView(APIView):
+    def get(self, request):
+        return Response({"status": "file processed"}, status=202)
+    def post(self, request):
+        new_selection = Selection.objects.create(
+            user=request.user,
+            name=request.data.get('name'),
+        )
+
+        for item in request.data.get('items', []):
+            SelectionItem.objects.create(
+                selection=new_selection,
+                uid=item.get('uid'),
+            )
+
+        return Response({"status": "file processed"}, status=202)
+    def patch(self, request):
+        return Response({"status": "file processed"}, status=202)

@@ -1,6 +1,6 @@
 from decimal import Decimal
-
 from django.db import models
+
 
 class Cart(models.Model):
     session_uuid = models.CharField(max_length=255, blank=True, null=True)

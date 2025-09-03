@@ -239,6 +239,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 
 class SelectionItemSerializer(serializers.ModelSerializer):
+    item = ProductShortSerializer(many=False, read_only=True)
     class Meta:
         model = SelectionItem
         fields = '__all__'

@@ -11,6 +11,8 @@ class UserAdmin(BaseUserAdmin):
         'phone',
         'is_opt_user',
         'is_active',
+        'is_staff',
+        'is_superuser',
         'date_joined',
 
     )
@@ -32,12 +34,10 @@ class UserAdmin(BaseUserAdmin):
         (None, {'fields': ('email', 'password')}),
         ('Personal info',
          {'fields': (
-
-
-                "fio",
-                "phone",
-                'is_opt_user'
-
+            "fio",
+            "phone",
+            'is_opt_user',
+            'is_active',
          )}
          ),
         ('Permissions', {'fields': ('is_staff', 'is_superuser', 'groups',)}),)

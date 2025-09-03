@@ -2,6 +2,7 @@ import json
 from unicodedata import category
 
 from django.db.models import Q, Count
+from django.template.base import kwarg_re
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
@@ -314,19 +315,63 @@ class GetBanners(generics.ListAPIView):
 
 class SelectionAPIView(APIView):
     def get(self, request):
-        return Response({"status": "file processed"}, status=202)
-    def post(self, request):
-        new_selection = Selection.objects.create(
-            user=request.user,
-            name=request.data.get('name'),
-        )
+        qs = Selection.objects.all()
+        serializer = SelectionSerializer(qs, many=True)
+        return Response(serializer.data, status=202)
 
-        for item in request.data.get('items', []):
+    def post(self, request):
+        print(request.data)
+        id = request.data.get('id', None)
+        print(request.data.get('is_sale') in ['true', 'True', True, 1, '1'])
+        image = request.data.get('image', None)
+        if id:
+            selection_obj = Selection.objects.get(id=id)
+            selection_obj.name=request.data.get('name')
+            selection_obj.promo=request.data.get('promo')
+            selection_obj.is_sale=request.data.get('is_sale') in ['true', 'True', True, 1, '1']
+
+            selection = selection_obj
+            selection_obj.items.all().delete()
+            if image:
+                selection_obj.image = image
+            selection_obj.save()
+        else:
+            new_selection = Selection.objects.create(
+                user=request.user,
+                name=request.data.get('name'),
+                promo=request.data.get('promo'),
+                is_sale=request.data.get('is_sale') in ['true', 'True', True, 1, '1'],
+
+            )
+            selection = new_selection
+            if image:
+                new_selection.image = image
+                new_selection.save()
+        items_raw = request.data.get('items')
+        if items_raw:
+            try:
+                items = json.loads(items_raw)
+            except (TypeError, json.JSONDecodeError):
+                items = []
+        else:
+            items = []
+
+        for item in items:
             SelectionItem.objects.create(
-                selection=new_selection,
-                uid=item.get('uid'),
+                selection=selection,
+                item_id=item.get('id'),
             )
 
-        return Response({"status": "file processed"}, status=202)
-    def patch(self, request):
-        return Response({"status": "file processed"}, status=202)
+        return Response(status=200)
+
+    def delete(self, request):
+        pk = request.data.get("pk")
+        if not pk:
+            return Response({"error": "pk is required"}, status=400)
+
+        try:
+            selection = Selection.objects.get(pk=pk, user=request.user)
+            selection.delete()
+            return Response({"status": "deleted"}, status=204)
+        except Selection.DoesNotExist:
+            return Response({"error": "Not found"}, status=404)

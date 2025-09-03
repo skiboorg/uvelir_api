@@ -227,10 +227,10 @@ class Size(models.Model):
                                 related_name='sizes')
     size = models.CharField('Размер', max_length=20, blank=True, null=True)
     quantity = models.IntegerField('Остаток', blank=True, null=True)
-    price = models.DecimalField('Цена', default=0, decimal_places=2, max_digits=7, blank=True, null=True)
-    price_init = models.DecimalField('Цена исходная', default=0, decimal_places=2, max_digits=7, blank=True, null=True)
-    price_opt = models.DecimalField('Цена оптовая', default=0, decimal_places=2, max_digits=7, blank=True, null=True)
-    price_opt_init = models.DecimalField('Цена оптовая исходная', default=0, decimal_places=2, max_digits=7, blank=True, null=True)
+    price = models.DecimalField('Цена', default=0, decimal_places=2, max_digits=10, blank=True, null=True)
+    price_init = models.DecimalField('Цена исходная', default=0, decimal_places=2, max_digits=10, blank=True, null=True)
+    price_opt = models.DecimalField('Цена оптовая', default=0, decimal_places=2, max_digits=10, blank=True, null=True)
+    price_opt_init = models.DecimalField('Цена оптовая исходная', default=0, decimal_places=2, max_digits=10, blank=True, null=True)
 
     min_weight = models.DecimalField('Минимальный вес', decimal_places=4, max_digits=8, blank=True, null=True)
     max_weight = models.DecimalField('Максимальный вес', decimal_places=4, max_digits=8, blank=True, null=True)
@@ -247,14 +247,12 @@ class Size(models.Model):
 
 
 
-
 class Popular(models.Model):
     order_num = models.IntegerField(default=1, null=True)
     uid = models.CharField(max_length=255, blank=False, null=False)
 
     def __str__(self):
         return f'{self.uid}'
-
 
     class Meta:
         ordering = ('order_num',)
@@ -278,9 +276,10 @@ class Banner(models.Model):
     text_small = models.TextField('Текст маленький', blank=True, null=True)
     button_text = models.CharField('Текст на кнопке',max_length=255, blank=True, null=False)
     button_url = models.CharField('Ссылка на кнопке',max_length=255, blank=True, null=False)
+
+
     def __str__(self):
         return f'{self.order_num}'
-
 
 
     class Meta:
@@ -323,6 +322,7 @@ class Selection(models.Model):
     created_at = models.DateField(auto_now_add=True)
     is_sale = models.BooleanField(default=False, null=False)
 
+
 class SelectionItem(models.Model):
-    uid = models.CharField(max_length=255, blank=True, null=True)
     selection = models.ForeignKey(Selection, on_delete=models.CASCADE, null=True, blank=True, related_name='items')
+    item = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)

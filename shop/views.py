@@ -12,9 +12,8 @@ from rest_framework import generics
 from .models import *
 
 
-
-
 from .tasks import updateItems
+
 class GetCategories(generics.ListAPIView):
     serializer_class = CategoryShortSerializer
     queryset = Category.objects.filter(is_active=True)

@@ -186,7 +186,13 @@ def updateItems(file=None):
                     except:
                         pass
 
-            new_product.not_image = not_image
+            #new_product.not_image = not_image
+
+            if len(new_product.images.all()) >0 :
+                new_product.not_image = False
+            else:
+                new_product.not_image = True
+
             if len(garniture_set) > 0:
                 new_product.has_garniture = True
             new_product.garniture_set_uuids = ','.join(garniture_set)

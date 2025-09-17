@@ -312,6 +312,11 @@ class GetBanners(generics.ListAPIView):
     serializer_class = BannerSerializer
 
 
+class SelectionRetriveView(generics.RetrieveAPIView):
+    serializer_class = SelectionSerializer
+    queryset = Selection.objects.all()
+    lookup_field = 'promo'
+
 class SelectionAPIView(APIView):
     def get(self, request):
         qs = Selection.objects.all()

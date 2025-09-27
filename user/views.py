@@ -48,14 +48,19 @@ class ActivateUser(APIView):
         token = request.data.get('token', None)
         if token is None:
             return Response({'success': False}, status=status.HTTP_200_OK)
-        user_qs = User.objects.filter(activate_token=token, is_active=False)
+        user_qs = User.objects.filter(activate_token=token)
         if user_qs.exists():
+
             user = user_qs.first()
+            is_active = user.is_active
             user.is_active = True
             user.save(update_fields=['is_active'])
         else:
             return Response({'success': False}, status=status.HTTP_200_OK)
-        return Response({'success': True}, status=status.HTTP_200_OK)
+        return Response(
+            {'success': True,
+             'message':"Ваш аккаунт уже был успешно активирован ранее, вы можете авторизоваться на нашем сайте" if is_active else "Ваш аккаунт был успешно активирован, вы можете авторизоваться на нашем сайте"
+             }, status=status.HTTP_200_OK)
 
 class UpdateUser(APIView):
     def patch(self, request):

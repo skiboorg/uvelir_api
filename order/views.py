@@ -52,10 +52,14 @@ class OrderView(APIView):
             else:
                 price = item.size.price
 
+            if item.product.images.exists():
+                image = item.product.images.first().file
+            else:
+                image = None
             OrderItem.objects.create(
                 order=new_order,
                 article=item.product.article,
-                image=item.product.image,
+                image=image,
                 name=item.product.name,
                 avg_weight=item.size.avg_weight,
                 amount=item.amount,
@@ -68,7 +72,10 @@ class OrderView(APIView):
         result = {'success': True, 'message': new_order.id}
 
         msg_html = render_to_string('order.html', {'order': new_order})
-        send_mail('Новый заказ', None, 'noreply@sh44.ru', [new_order.email,'stepenina@mail.ru'],
+        email_list = [new_order.email,'stepenina@mail.ru']
+        # email_list = ['greshnik.im@gmail.com']
+        send_mail('Новый заказ', None, 'noreply@sh44.ru',
+                  email_list,
                   fail_silently=False, html_message=msg_html)
 
         return Response(result, status=200)

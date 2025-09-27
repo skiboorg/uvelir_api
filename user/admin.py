@@ -38,6 +38,7 @@ class UserAdmin(BaseUserAdmin):
             "phone",
             'is_opt_user',
             'is_active',
+            'activate_token',
          )}
          ),
         ('Permissions', {'fields': ('is_staff', 'is_superuser', 'groups',)}),)

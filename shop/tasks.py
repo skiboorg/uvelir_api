@@ -254,8 +254,9 @@ def updateItems(file=None):
 
                     # обновляем min_weight только если новое меньше
                     new_min_weight = safe_decimal(size.get('WeightMin'))
-                    if new_min_weight < size_obj.min_weight:
-                        size_obj.min_weight = new_min_weight
+                    size_obj.min_weight = new_min_weight
+                    # if new_min_weight < size_obj.min_weight:
+                    #     size_obj.min_weight = new_min_weight
 
                     # обновляем max_weight только если новое больше
                     new_max_weight = safe_decimal(size.get('WeightMax'))

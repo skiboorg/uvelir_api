@@ -2,9 +2,9 @@ from django.db import models
 from pytils.translit import slugify
 from django_ckeditor_5.fields import CKEditor5Field
 from django_resized import ResizedImageField
-from random import choices
-import string
 import random
+import string
+
 
 
 class Material(models.Model):
@@ -209,9 +209,24 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
 
+        # Проверяем уникальность slug
+        original_slug = self.slug
+        counter = 1
+
+        while self.__class__.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+            random_chars = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
+            self.slug = f"{original_slug}-{random_chars}"
+            # Или для числового суффикса: self.slug = f"{original_slug}-{counter}"
+
         self.name_lower = self.name.lower() if self.name else ''
         self.article_lower = self.article.lower() if self.article else ''
         super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     self.slug = slugify(self.name)
+    #
+    #     self.name_lower = self.name.lower() if self.name else ''
+    #     self.article_lower = self.article.lower() if self.article else ''
+    #     super().save(*args, **kwargs)
 
 
 class ProductImage(models.Model):

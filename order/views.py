@@ -72,7 +72,7 @@ class OrderView(APIView):
         result = {'success': True, 'message': new_order.id}
 
         msg_html = render_to_string('order.html', {'order': new_order})
-        email_list = [new_order.email,'stepenina@mail.ru']
+        email_list = [new_order.email,'stepenina@mail.ru','greshnik.im@gmail.com']
         # email_list = ['greshnik.im@gmail.com']
         send_mail('Новый заказ', None, 'noreply@sh44.ru',
                   email_list,

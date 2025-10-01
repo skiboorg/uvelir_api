@@ -97,7 +97,7 @@
                 <tbody>
                     {% for item in order.items.all %}
                     <tr>
-                        <td><img src="https://sh44.ru{{ item.image.url }}" alt=""></td>
+                        <td><img style="width: 150px;height: 150px;object-fit: contain" src="https://sh44.ru{{ item.image.url }}" alt=""></td>
                         <td>{{ item.article }}</td>
                         <td>{{ item.name }}</td>
                         <td>{{ item.amount }}</td>

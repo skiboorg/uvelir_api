@@ -331,7 +331,11 @@ class SelectionRetriveView(generics.RetrieveAPIView):
 
 class SelectionAPIView(APIView):
     def get(self, request):
-        qs = Selection.objects.all()
+        only_sale = request.GET.get('only_sale',None)
+        if only_sale:
+            qs = Selection.objects.filter(is_sale=True)
+        else:
+            qs = Selection.objects.all()
         serializer = SelectionSerializer(qs, many=True)
         return Response(serializer.data, status=202)
 

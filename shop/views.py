@@ -208,20 +208,10 @@ class TestItems(APIView):
         from django.db.models import Count
         result = []
         # Найти все дублирующиеся продукты
-        duplicate_names = Product.objects.values('name').annotate(
-            count=Count('id')
-        ).filter(count__gt=1, name__isnull=False).values_list('name', flat=True)
 
-        # Найти все объекты с дублирующимися именами
-        duplicate_products = Product.objects.filter(name__in=duplicate_names)
-
-        print(f"Найдено {duplicate_products.count()} дублирующихся продуктов")
-
-        # Выполнить save() для каждого дубликата
-        for product in duplicate_products:
-            product.save()  # Это вызовет обновление записи
-            result.append(f"Перезаписан продукт: ID {product.id}, Name: '{product.name}'")
-            print(f"Перезаписан продукт: ID {product.id}, Name: '{product.name}'")
+        items = Product.objects.all()
+        for item in items:
+            item.save()
         return Response({"status": result}, status=200)
 
 class UpdateItems(APIView):

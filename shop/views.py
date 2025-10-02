@@ -2,6 +2,7 @@ import json
 from unicodedata import category
 
 from django.db.models import Q, Count
+from django.db.models.expressions import result
 from django.template.base import kwarg_re
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -201,6 +202,27 @@ class GetNewProducts(generics.ListAPIView):
     queryset = Product.objects.filter(is_new=True, is_active=True)
 
 
+
+class TestItems(APIView):
+    def get(self, request):
+        from django.db.models import Count
+        result = []
+        # Найти все дублирующиеся продукты
+        duplicate_names = Product.objects.values('name').annotate(
+            count=Count('id')
+        ).filter(count__gt=1, name__isnull=False).values_list('name', flat=True)
+
+        # Найти все объекты с дублирующимися именами
+        duplicate_products = Product.objects.filter(name__in=duplicate_names)
+
+        print(f"Найдено {duplicate_products.count()} дублирующихся продуктов")
+
+        # Выполнить save() для каждого дубликата
+        for product in duplicate_products:
+            product.save()  # Это вызовет обновление записи
+            result.append(f"Перезаписан продукт: ID {product.id}, Name: '{product.name}'")
+            print(f"Перезаписан продукт: ID {product.id}, Name: '{product.name}'")
+        return Response({"status": result}, status=200)
 
 class UpdateItems(APIView):
     def get(self, request):

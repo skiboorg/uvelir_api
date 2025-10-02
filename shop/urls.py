@@ -14,6 +14,7 @@ urlpatterns = [
     path('popular', views.GetPopularProducts.as_view()),
     path('recomended', views.GetRecomendedProducts.as_view()),
     path('updateitems', views.UpdateItems.as_view()),
+    path('testitems', views.TestItems.as_view()),
 
     path('search', views.ProductSearchView.as_view()),
     path('fav', views.FavoriteView.as_view()),

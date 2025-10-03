@@ -309,6 +309,7 @@ def updateItems(file=None):
     # --- финальная проверка категорий ---
     print('check categories')
     for product in Product.objects.all():
+        product.save()
         try:
             if not product.subcategory.category.is_active:
                 product.hidden_category = True

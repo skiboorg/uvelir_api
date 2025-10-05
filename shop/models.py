@@ -207,16 +207,17 @@ class Product(models.Model):
         return self.images.count() > 0
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        if not self.slug:
+            self.slug = slugify(self.name)
 
-        # Проверяем уникальность slug
-        original_slug = self.slug
-        counter = 1
+            # Проверяем уникальность slug
+            original_slug = self.slug
+            counter = 1
 
-        while self.__class__.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
-            random_chars = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
-            self.slug = f"{original_slug}-{random_chars}"
-            # Или для числового суффикса: self.slug = f"{original_slug}-{counter}"
+            while self.__class__.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                random_chars = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
+                self.slug = f"{original_slug}-{random_chars}"
+                # Или для числового суффикса: self.slug = f"{original_slug}-{counter}"
 
         self.name_lower = self.name.lower() if self.name else ''
         self.article_lower = self.article.lower() if self.article else ''

@@ -11,9 +11,9 @@ from django.template.loader import render_to_string
 
 class OrderView(APIView):
     def get(self, request):
-        print(request.data)
-        result = {}
-        return Response(status=200)
+        order = Order.objects.all()
+        serializer = OrderSerializer(order, many=True)
+        return Response(serializer.data, status=200)
 
     def delete(self, request):
         print(request.data)

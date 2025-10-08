@@ -11,12 +11,33 @@ class CoatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coating
         fields = '__all__'
+# -------------------------
+
+
+
+class GemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gem
+        fields = '__all__'
+
+class GemGroupSerializer(serializers.ModelSerializer):
+    gems = GemSerializer(many=True, read_only=True)
+    class Meta:
+        model = GemGroup
+        fields = '__all__'
+
+class FinenessGemSerializer(serializers.ModelSerializer):
+    gem = GemSerializer(many=False, read_only=True)
+    class Meta:
+        model = FinenessGem
+        fields = '__all__'
 
 class FinenessSerializer(serializers.ModelSerializer):
+    gems = FinenessGemSerializer(many=True, read_only=True)
     class Meta:
         model = Fineness
         fields = '__all__'
-
+# -------------------------
 class MaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Material

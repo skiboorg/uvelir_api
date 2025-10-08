@@ -14,7 +14,6 @@ class Material(models.Model):
     metal = models.CharField('Метал', max_length=255, blank=True, null=True)
     probe = models.CharField('Проба', max_length=255, blank=True, null=True)
     def save(self, *args, **kwargs):
-
         self.value = slugify(self.label)
         super().save(*args, **kwargs)
 
@@ -25,6 +24,29 @@ class Material(models.Model):
 
         verbose_name = 'Материал'
         verbose_name_plural = 'Материалы'
+
+
+class Gem(models.Model):
+    uid = models.CharField(max_length=255, blank=False, null=False)
+    label = models.CharField('Название', max_length=255, blank=False, null=True)
+    def __str__(self):
+        return f'{self.label}'
+
+    class Meta:
+        verbose_name = 'Камень'
+        verbose_name_plural = 'Камень'
+
+
+class GemGroup(models.Model):
+    uid = models.CharField(max_length=255, blank=False, null=False)
+    label = models.CharField('Название', max_length=255, blank=False, null=True)
+    gems = models.ManyToManyField(Gem)
+    def __str__(self):
+        return f'{self.label}'
+
+    class Meta:
+        verbose_name = 'Группа камней'
+        verbose_name_plural = 'Группа камней'
 
 
 class Fineness(models.Model):
@@ -44,6 +66,17 @@ class Fineness(models.Model):
         verbose_name = 'Вставка'
         verbose_name_plural = 'Вставки'
 
+class FinenessGem(models.Model):
+    gem = models.ForeignKey(Gem, on_delete=models.CASCADE, blank=True, null=True)
+    fineness = models.ForeignKey(Fineness, on_delete=models.CASCADE, blank=True, null=True, related_name='gems')
+    quantity = models.IntegerField(default=0, blank=True, null=True)
+    weight = models.CharField(max_length=10, blank=True, null=True)
+    def __str__(self):
+        return f'{self.gem.label}'
+
+    class Meta:
+        verbose_name = 'Элементы вставки'
+        verbose_name_plural = 'Элементы вставки'
 
 class Coating(models.Model):
     uid = models.CharField(max_length=255, blank=False, null=False)

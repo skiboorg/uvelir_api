@@ -38,7 +38,7 @@ def updateItems(file=None):
     if file:
         data = file
     else:
-        with open('export.json', 'r', encoding='utf-8') as f:
+        with open('test_big.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
 
     categories = data.get('Categories', {})
@@ -46,12 +46,21 @@ def updateItems(file=None):
     coatings_obj = data.get('Coatings', {})
     gemstones_obj = data.get('Gemstones', {})
     products_obj = data.get('Products', {})
+    gemstoneBase_obj = data.get('GemstoneBase', {})
 
     materials = materials_obj.get('Elements', [])
     coatings = coatings_obj.get('Elements', [])
     gemstones = gemstones_obj.get('Elements', [])
     products = products_obj.get('Elements', [])
     categories_elements = categories.get('Elements', [])
+    gemstoneBase_elements = gemstoneBase_obj.get('Elements', [])
+
+    for element in gemstoneBase_elements:
+        gem,created = Gem.objects.get_or_create(uid=element.get('GemstoneProductID'))
+        if created:
+            gem.label = element.get('Name')
+            gem.save(update_fields=['label'])
+
 
     # --- Категории ---
     for category in categories_elements:
@@ -96,12 +105,26 @@ def updateItems(file=None):
 
     # --- Драгоценные камни ---
     for gemstone in gemstones:
-        obj, created = Fineness.objects.get_or_create(
+        elements = gemstone.get('Elements', [])
+        fineness_obj, created = Fineness.objects.get_or_create(
             uid=gemstone.get('GemstoneID'),
             label=gemstone.get('Name')
         )
         if not created:
-            obj.save()
+            fineness_obj.save()
+
+        for element in elements:
+            gem_qs = Gem.objects.filter(uid=element.get('ProductID'))
+            if gem_qs.exists():
+                gem_obj = gem_qs.first()
+                fineness_gem_obj,fineness_gem_obj_created =  FinenessGem.objects.get_or_create(
+                    fineness=fineness_obj,
+                    gem=gem_obj,
+                )
+                fineness_gem_obj.weight = element.get('Weight','0')
+                fineness_gem_obj.quantity = element.get('Quantity',0)
+                fineness_gem_obj.save(update_fields=['weight', 'quantity'])
+
 
     # --- Продукты ---
 

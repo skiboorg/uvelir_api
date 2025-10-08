@@ -15,6 +15,11 @@ class ImageInline(NestedStackedInline):
     extra = 0
 
 
+class FinenessGemInline(NestedStackedInline):
+    model = FinenessGem
+    extra = 0
+
+
 class ProductAdmin(NestedModelAdmin):
     list_display = ('image_preview','article','name','total_quantity','has_garniture','product_url','subcategory','filter','is_new','is_popular','is_active',)
     model = Product
@@ -112,9 +117,31 @@ class SelectionAdmin(NestedModelAdmin):
     model = Selection
     inlines = [SelectionItemInline]
 
+
+class FinenessAdmin(NestedModelAdmin):
+    list_display = ('label', )
+    model = Fineness
+    inlines = [FinenessGemInline]
+
+class GemInline(NestedStackedInline):
+    model = Gem
+    extra = 0
+
+class GemGroupAdmin(NestedModelAdmin):
+    list_display = ('label', )
+    model = GemGroup
+    inlines = [GemInline]
+
+class GemAdmin(NestedModelAdmin):
+    list_display = ('label', )
+    search_fields = ('uid',)
+    model = Gem
+
 admin.site.register(Category, CategoryAdmin)
-admin.site.register(Fineness)
+admin.site.register(Fineness,FinenessAdmin)
 admin.site.register(Coating)
+admin.site.register(Gem,GemAdmin)
+admin.site.register(GemGroup)
 admin.site.register(SubCategory,SubCategoryAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(SubCategoryFilter)

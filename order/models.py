@@ -75,7 +75,7 @@ class Order(models.Model):
         print(result)
         return result
     class Meta:
-
+        ordering = ['-created_at']
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
 

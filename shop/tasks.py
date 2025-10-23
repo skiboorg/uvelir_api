@@ -311,7 +311,7 @@ def updateItems(file=None):
                 price_opt_calc = math.ceil(size_obj.price_opt_init * size_obj.max_weight)
                 price_calc = math.trunc((price_opt_calc * Decimal(2)) / 10) * 10
                 size_obj.price_opt = price_opt_calc
-                size_obj.price = price_calc
+                size_obj.price = price_calc + Decimal(300)
 
                 size_obj.save()
 

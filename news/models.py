@@ -27,6 +27,8 @@ class Tag(models.Model):
 
 class NewsItem(models.Model):
     order_num = models.IntegerField(default=1, null=True)
+    page_title = models.CharField(max_length=255, blank=True, null=True)
+    page_description = models.TextField(blank=True, null=True)
     tag = models.ForeignKey(Tag,blank=True,null=True,on_delete=models.CASCADE,related_name='Тег')
     image = ResizedImageField('Картинка превью',size=[470, 315], quality=95, force_format='WEBP', upload_to='news/images',
                               blank=False, null=True)

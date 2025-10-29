@@ -193,6 +193,10 @@ class SubcategorySizeFilter(models.Model):
 
 
 class Product(models.Model):
+    page_title = models.CharField(max_length=255, blank=True, null=True)
+    page_description = models.TextField(blank=True, null=True)
+    page_content = CKEditor5Field( blank=True, null=True)
+
     uid = models.CharField(max_length=255, blank=False, null=False, db_index=True)
     article = models.CharField('Артикул',max_length=100,blank=True, null=True)
     article_lower = models.CharField('Артикул',max_length=100,blank=True, null=True)
@@ -375,3 +379,18 @@ class Selection(models.Model):
 class SelectionItem(models.Model):
     selection = models.ForeignKey(Selection, on_delete=models.CASCADE, null=True, blank=True, related_name='items')
     item = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
+
+
+class SEOPage(models.Model):
+    slug = models.CharField(max_length=255, unique=True,
+                            help_text="Уникальный путь страницы (например: 'about' или 'contacts')")
+    title = models.CharField(max_length=255, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    keywords = models.TextField(blank=True, null=True)
+    content = CKEditor5Field('SEO текст', blank=True, null=False)
+    class Meta:
+        verbose_name = "SEO для страницы"
+        verbose_name_plural = "SEO страницы"
+
+    def __str__(self):
+        return self.slug

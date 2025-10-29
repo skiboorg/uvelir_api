@@ -395,3 +395,8 @@ class SelectionAPIView(APIView):
             return Response({"status": "deleted"}, status=204)
         except Selection.DoesNotExist:
             return Response({"error": "Not found"}, status=404)
+
+class SEOPageViewSet(generics.RetrieveAPIView):
+    queryset = SEOPage.objects.all()
+    serializer_class = SEOPageSerializer
+    lookup_field = "slug"

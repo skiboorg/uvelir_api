@@ -21,4 +21,5 @@ urlpatterns = [
     path('banners', views.GetBanners.as_view()),
     path('selection', views.SelectionAPIView.as_view()),
     path('selection/<promo>', views.SelectionRetriveView.as_view()),
+    path('seo/<slug>/', views.SEOPageViewSet.as_view()),
 ]

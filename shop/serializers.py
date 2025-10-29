@@ -13,7 +13,10 @@ class CoatingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 # -------------------------
 
-
+class SEOPageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SEOPage
+        fields = "__all__"
 
 class GemSerializer(serializers.ModelSerializer):
     class Meta:

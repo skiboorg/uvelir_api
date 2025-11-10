@@ -9,6 +9,17 @@ from .models import *
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 
+class ResendEmail(APIView):
+    def get(self, request):
+        order_id = request.GET.get('order_id')
+        order = Order.objects.get(id=order_id)
+        msg_html = render_to_string('order.html', {'order': order})
+        email_list = [order.email, 'stepenina@mail.ru', 'greshnik.im@gmail.com']
+        send_mail('Новый заказ', None, 'noreply@sh44.ru',
+                  email_list,
+                  fail_silently=False, html_message=msg_html)
+        return Response(status=200)
+
 class OrderView(APIView):
     def get(self, request):
         order = Order.objects.all()

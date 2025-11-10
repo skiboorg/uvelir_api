@@ -7,6 +7,7 @@ urlpatterns = [
 
     path('delivery', views.GetDeliveries.as_view()),
     path('payment', views.GetPayments.as_view()),
+    path('resend_email', views.ResendEmail.as_view()),
 
 
 

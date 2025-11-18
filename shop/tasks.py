@@ -33,13 +33,39 @@ def process_image_to_webp(file_path, output_size=(1000, 1000)):
         file_name = os.path.splitext(os.path.basename(file_path))[0] + ".webp"
         return ContentFile(buffer.read(), name=file_name)
 
+
+def get_or_create_size(product, size_value):
+    # Сначала проверяем есть ли дубликаты
+    existing_sizes = Size.objects.filter(
+        product=product,
+        size=size_value
+    )
+
+    if existing_sizes.count() > 1:
+        # Есть дубликаты - удаляем лишние
+        size_obj = existing_sizes.first()
+        existing_sizes.exclude(id=size_obj.id).delete()
+        return size_obj, False
+    elif existing_sizes.count() == 1:
+        # Одна запись - возвращаем её
+        return existing_sizes.first(), False
+    else:
+        # Нет записей - создаём новую
+        size_obj = Size.objects.create(
+            product=product,
+            quantity=0,
+            size=size_value
+        )
+        return size_obj, True
+
 @shared_task
 def updateItems(file=None):
     if file:
         data = file
     else:
-        with open('test_big.json', 'r', encoding='utf-8') as f:
+        with open('test.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
+    #Product.objects.all().delete()
 
     categories = data.get('Categories', {})
     materials_obj = data.get('Materials', {})
@@ -177,7 +203,7 @@ def updateItems(file=None):
             new_product.name = product.get('Name')
 
             not_image = True
-
+            new_product.images.all().delete()
             # --- основное фото ---
             if filename != 'NULL':
                 image_path = f'shop/product/images/{filename}'
@@ -235,8 +261,6 @@ def updateItems(file=None):
                 price_key = size.get('RetailPrice')
                 price_opt_key = size.get('WholesalePrice')
 
-                # print('price_key',price_key)
-                # print('price_opt_key',price_opt_key)
 
                 if price_key == '':
                     price = 0
@@ -251,22 +275,16 @@ def updateItems(file=None):
                 min_weight = safe_decimal(size.get('WeightMin'))
                 max_weight = safe_decimal(size.get('WeightMax'))
 
-                size_obj, size_created = Size.objects.get_or_create(
-                    product=new_product,
-                    quantity=0,
-                    size=size.get('Size')
+                size_obj, size_created = get_or_create_size(
+                    new_product,
+                    size.get('Size')
                 )
 
                 current_sizes_in_file.add(size.get('Size'))
 
                 if not size_created:
-                    if new_product.uid == '67e5a7fa-71cd-11e7-8012-2cd05a7e0d9d':
-                        print('size exixt',size_obj.size)
-                        print('size_obj.quantity',size_obj.quantity)
-                    # суммируем количество
                     size_obj.quantity += int(size.get('Quantity', 0))
 
-                    # обновляем цену, если новая больше
                     if price > size_obj.price:
                         size_obj.price = price
                         size_obj.price_init = price
@@ -275,13 +293,9 @@ def updateItems(file=None):
                         size_obj.price_opt = price_opt
                         size_obj.price_opt_init = price_opt
 
-                    # обновляем min_weight только если новое меньше
                     new_min_weight = safe_decimal(size.get('WeightMin'))
                     size_obj.min_weight = new_min_weight
-                    # if new_min_weight < size_obj.min_weight:
-                    #     size_obj.min_weight = new_min_weight
 
-                    # обновляем max_weight только если новое больше
                     new_max_weight = safe_decimal(size.get('WeightMax'))
                     if new_max_weight > size_obj.max_weight:
                         size_obj.max_weight = new_max_weight
@@ -289,11 +303,8 @@ def updateItems(file=None):
                     # пересчитываем avg_weight
                     size_obj.avg_weight = (size_obj.min_weight + size_obj.max_weight) / 2
                 else:
+                    print('size_obj',size_obj, new_product)
                     avg_weight = (min_weight + max_weight) / 2
-                    print(product)
-                    print(size_obj)
-                    print('size_obj.quantity',size_obj.quantity)
-
                     size_obj.quantity += int(size.get('Quantity', 0))
                     size_obj.price = price
                     size_obj.price_init = price
@@ -315,11 +326,6 @@ def updateItems(file=None):
 
                 size_obj.save()
 
-            # --- деактивируем старые размеры, которых нет в файле ---
-            # for old_size in new_product.sizes.exclude(size__in=current_sizes_in_file):
-            #     old_size.delete()
-
-            # --- пересчёт остатков ---
             quantity = sum(s.quantity for s in new_product.sizes.all())
             if quantity == 0:
                 new_product.is_active = False
@@ -327,7 +333,7 @@ def updateItems(file=None):
                 new_product.save()
 
         except Exception as e:
-            print('products', e)
+            print('products', e, product.get('ID'))
 
     # --- финальная проверка категорий ---
     print('check categories')
@@ -336,6 +342,9 @@ def updateItems(file=None):
         try:
             if not product.subcategory.category.is_active:
                 product.hidden_category = True
+                product.save()
+            else:
+                product.hidden_category = False
                 product.save()
         except Exception as e:
             print('check categories', e)

@@ -318,6 +318,18 @@ class Favorite(models.Model):
     user = models.ForeignKey('user.User', on_delete=models.CASCADE, null=False, blank=False, related_name='favorites')
 
 
+class ItemsFile(models.Model):
+    file = models.FileField(upload_to='shop/files', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f'{self.created_at}'
+
+
+    class Meta:
+        verbose_name = 'Файл выгрузки'
+        verbose_name_plural = 'Файлы выгрузки'
+
+
 class Banner(models.Model):
     order_num = models.IntegerField(default=10)
     image_big = ResizedImageField('Фон 1980х650', size=[1980, 650], quality=95, force_format='WEBP', upload_to='banner/images',
@@ -329,7 +341,7 @@ class Banner(models.Model):
     text_small = models.TextField('Текст маленький', blank=True, null=True)
     button_text = models.CharField('Текст на кнопке',max_length=255, blank=True, null=False)
     button_url = models.CharField('Ссылка на кнопке',max_length=255, blank=True, null=False)
-
+    use_white_text = models.BooleanField('Белый текст', default=False, null=False)
 
     def __str__(self):
         return f'{self.order_num}'

@@ -1,6 +1,8 @@
 import json
+
 from unicodedata import category
 
+from django.db import transaction
 from django.db.models import Q, Count
 from django.db.models.expressions import result
 from django.template.base import kwarg_re
@@ -230,7 +232,8 @@ class UpdateItems(APIView):
             file_content = json_file.read().decode("utf-8")
             json_data = json.loads(file_content)  # Проверяем, что это валидный JSON
 
-            # Передаем данные в Celery задачу
+            ItemsFile.objects.create(file=json_file)
+
             updateItems.delay(json_data)
             return Response({"status": "file processed"}, status=202)
 

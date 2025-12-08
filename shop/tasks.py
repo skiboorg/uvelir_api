@@ -180,6 +180,12 @@ def updateItems(file=None):
             filename = product.get('FileName')
             garniture_set = product.get('garniture_set', [])
 
+            product.null_opt_price = False
+            product.is_active = False
+            product.is_in_stock = False
+            product.not_image = False
+            product.save(update_fields=['null_opt_price', 'is_active', 'is_in_stock', 'not_image'])
+
             subcategory_obj = None
             if not subcategory.exists() and subcategory_filter.exists():
                 subcategory_qs = SubCategory.objects.filter(filters__in=subcategory_filter)

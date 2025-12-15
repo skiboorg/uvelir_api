@@ -325,7 +325,8 @@ def updateItems(file=None):
                     size_obj.product.null_opt_price = True
                     size_obj.product.save()
 
-                price_opt_calc = math.ceil(size_obj.price_opt_init * size_obj.max_weight)
+                #price_opt_calc = math.ceil(size_obj.price_opt_init * size_obj.max_weight)
+                price_opt_calc = math.ceil((size_obj.price_opt_init * size_obj.max_weight) * Decimal(1.41))
                 price_calc = math.trunc((price_opt_calc * Decimal(2)) / 10) * 10
                 size_obj.price_opt = price_opt_calc
                 size_obj.price = price_calc + Decimal(300)

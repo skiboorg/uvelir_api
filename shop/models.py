@@ -342,6 +342,7 @@ class Banner(models.Model):
     button_text = models.CharField('Текст на кнопке',max_length=255, blank=True, null=False)
     button_url = models.CharField('Ссылка на кнопке',max_length=255, blank=True, null=False)
     use_white_text = models.BooleanField('Белый текст', default=False, null=False)
+    use_small_text = models.BooleanField('Маленький текст', default=False, null=False)
 
     def __str__(self):
         return f'{self.order_num}'

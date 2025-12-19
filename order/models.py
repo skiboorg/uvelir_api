@@ -61,6 +61,7 @@ class Order(models.Model):
     is_paid = models.BooleanField('Оплачен', default=False, null=False)
     is_done = models.BooleanField('Обработан', default=False, null=False)
     is_deliveried = models.BooleanField('Доставлен', default=False, null=False)
+    is_decline = models.BooleanField('Отказ', default=False, null=False)
     comment = models.TextField('Коментарий', blank=True, null=True)
 
     def __str__(self):

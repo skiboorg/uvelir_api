@@ -278,8 +278,10 @@ def updateItems(file=None):
                 else:
                     price_opt = Decimal(price_opt_key.replace(',', '.'))
 
-                min_weight = safe_decimal(size.get('WeightMin'))
-                max_weight = safe_decimal(size.get('WeightMax'))
+                min_weight = safe_decimal(size.get('WeightMin',0))
+                max_weight = safe_decimal(size.get('WeightMax',0))
+
+
 
                 size_obj, size_created = get_or_create_size(
                     new_product,
@@ -299,18 +301,31 @@ def updateItems(file=None):
                         size_obj.price_opt = price_opt
                         size_obj.price_opt_init = price_opt
 
-                    new_min_weight = safe_decimal(size.get('WeightMin'))
+                    new_min_weight = safe_decimal(size.get('WeightMin',0))
                     size_obj.min_weight = new_min_weight
 
-                    new_max_weight = safe_decimal(size.get('WeightMax'))
+                    new_max_weight = safe_decimal(size.get('WeightMax',0))
                     if new_max_weight > size_obj.max_weight:
                         size_obj.max_weight = new_max_weight
 
                     # пересчитываем avg_weight
-                    size_obj.avg_weight = (size_obj.min_weight + size_obj.max_weight) / 2
+                    if new_min_weight == 0:
+                        size_obj.avg_weight = size_obj.max_weight
+                    elif new_max_weight == 0:
+                        size_obj.avg_weight = 0
+                    else:
+                        size_obj.avg_weight = (size_obj.min_weight + size_obj.max_weight) / 2
+
                 else:
                     print('size_obj',size_obj, new_product)
-                    avg_weight = (min_weight + max_weight) / 2
+                    if min_weight == 0:
+                        avg_weight =  max_weight
+                    elif max_weight == 0:
+                        avg_weight = 0
+                    else:
+                        avg_weight = (min_weight + max_weight) / 2
+
+
                     size_obj.quantity += int(size.get('Quantity', 0))
                     size_obj.price = price
                     size_obj.price_init = price

@@ -98,7 +98,14 @@ class ProductShortSerializer(serializers.ModelSerializer):
         return obj.sizes.aggregate(min_price=Min('price_opt'))['min_price']
 
     def get_avg_weight(self, obj):
-        return obj.sizes.aggregate(avg_weight=Avg('avg_weight'))['avg_weight']
+        result = 0
+        x = 0
+        for size in obj.sizes.all():
+            if size.weight > 0:
+                x = x + 1
+                result += size.avg_weight
+        return result / x
+        #return obj.sizes.aggregate(avg_weight=Avg('avg_weight'))['avg_weight']
 
     def get_cat_slug(self, obj):
         if obj.subcategory and obj.subcategory.category:

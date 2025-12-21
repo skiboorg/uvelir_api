@@ -99,7 +99,7 @@ class ProductShortSerializer(serializers.ModelSerializer):
 
     def get_avg_weight(self, obj):
         result = 0
-        x = 0
+        x = 1
         for size in obj.sizes.all():
             if size.avg_weight > 0:
                 x = x + 1

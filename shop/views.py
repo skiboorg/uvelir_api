@@ -42,7 +42,7 @@ class GetCategory(generics.RetrieveAPIView):
 
 
 class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 48  # Количество элементов на странице
+    page_size = 36  # Количество элементов на странице
     page_size_query_param = 'page_size'
     max_page_size = 100
 

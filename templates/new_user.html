@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .order-info {
+            margin-bottom: 20px;
+        }
+        .order-info p {
+            margin: 5px 0;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .items-table th, .items-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .items-table th {
+            background-color: #f4f4f4;
+        }
+        .total-price {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .footer {
+            background: #f4f4f4;
+            color: #555;
+            padding: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Новая регистрация аккаунта</h1>
+        </div>
+        <div class="content">
+           <p>ФИО:{{ user.fio }}</p>
+           <p>Email: {{ user.email }}</p>
+        </div>
+
+    </div>
+</body>
+</html>

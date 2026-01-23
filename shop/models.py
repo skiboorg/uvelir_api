@@ -95,6 +95,9 @@ class Coating(models.Model):
 class Category(models.Model):
     order_num = models.IntegerField(default=1, null=True)
     uid = models.CharField(max_length=255, blank=False, null=False)
+    page_title = models.CharField('Title',max_length=255, blank=True, null=True)
+    page_description = models.TextField( 'Description',blank=True, null=True)
+
     icon = ResizedImageField(size=[20, 20], quality=95, force_format='WEBP', upload_to='shop/category/icon',
                              blank=True, null=True)
     image = ResizedImageField(size=[420, 420], quality=95, force_format='WEBP', upload_to='shop/category/images',
@@ -151,6 +154,8 @@ class SubCategoryFilter(models.Model):
 
 
 class SubCategory(models.Model):
+    page_title = models.CharField('Title', max_length=255, blank=True, null=True)
+    page_description = models.TextField('Description', blank=True, null=True)
     order_num = models.IntegerField(default=1, null=True)
     uid = models.CharField(max_length=255, blank=False, null=False)
     filters = models.ManyToManyField(SubCategoryFilter, blank=True)

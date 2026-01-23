@@ -107,6 +107,9 @@ class UserCreateSerializer(serializers.ModelSerializer):
             msg_html = render_to_string('activate.html', {'token': token})
             send_mail('Подтверждение регистрации аккаунта', None, 'noreply@sh44.ru', [user.email],
                       fail_silently=False, html_message=msg_html)
+            msg_html = render_to_string('new_user.html', {'user': user})
+            send_mail('Новый юзер', None, 'noreply@sh44.ru', ['stepenina@mail.ru'],
+                      fail_silently=False, html_message=msg_html)
 
         return user
 

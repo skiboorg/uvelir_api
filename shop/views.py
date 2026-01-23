@@ -51,6 +51,42 @@ class GetSubCategory(generics.ListAPIView):
     serializer_class = ProductShortSerializer
     pagination_class = StandardResultsSetPagination
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        subcategory_slug = self.kwargs.get('subcategory_slug')
+        category_slug = self.request.query_params.get('category')
+
+        # Определяем откуда брать page_title и page_description
+        page_title = None
+        page_description = None
+
+        if subcategory_slug == 'all' and category_slug:
+            category = Category.objects.filter(slug=category_slug).first()
+            if category:
+                page_title = category.page_title
+                page_description = category.page_description
+        else:
+            subcategory = SubCategory.objects.filter(slug=subcategory_slug).first()
+            if subcategory:
+                page_title = subcategory.page_title
+                page_description = subcategory.page_description
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            response = self.get_paginated_response(serializer.data)
+            response.data['page_title'] = page_title
+            response.data['page_description'] = page_description
+            return response
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'results': serializer.data,
+            'page_title': page_title,
+            'page_description': page_description
+        })
+
     def get_queryset(self):
         subcategory_slug = self.kwargs.get('subcategory_slug')
         category_slug = self.request.query_params.get('category')

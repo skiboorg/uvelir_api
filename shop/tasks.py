@@ -58,6 +58,7 @@ def get_or_create_size(product, size_value):
         )
         return size_obj, True
 
+
 @shared_task
 def updateItems(file=None):
     if file:
@@ -157,16 +158,16 @@ def updateItems(file=None):
     incoming_uids = [item['ID'] for item in products]
     print(incoming_uids)
     Product.objects.exclude(uid__in=incoming_uids).update(is_active=False,is_in_stock=False)
-    Size.objects.update(
-        price=0,
-        price_init=0,
-        price_opt=0,
-        price_opt_init=0,
-        quantity=0,
-        min_weight=0,
-        max_weight=0,
-        avg_weight=0
-    )
+    # Size.objects.update(
+    #     price=0,
+    #     price_init=0,
+    #     price_opt=0,
+    #     price_opt_init=0,
+    #     quantity=0,
+    #     min_weight=0,
+    #     max_weight=0,
+    #     avg_weight=0
+    # )
     for product in products:
         try:
             sizes = product.get('AvailableOptions', [])
@@ -213,13 +214,13 @@ def updateItems(file=None):
             # --- основное фото ---
             if filename != 'NULL':
                 image_path = f'shop/product/images/{filename}'
-                file_name = os.path.splitext(os.path.basename(filename))[0] + ".webp"
-                if not new_product.images.filter(file__icontains=file_name, is_main=True).exists():
+                #file_name = os.path.splitext(os.path.basename(filename))[0] + ".webp"
+                if not new_product.images.filter(file__icontains=filename, is_main=True).exists():
                     try:
                         image = process_image_to_webp(image_path)
                         ProductImage.objects.create(
                             product=new_product,
-                            file=image,
+                            file=image_path,
                             is_main=True
                         )
                         not_image = False
@@ -228,14 +229,14 @@ def updateItems(file=None):
 
             # --- дополнительные фото ---
             for photo in anotherphoto:
-                file_name = os.path.splitext(os.path.basename(photo))[0] + ".webp"
-                if not new_product.images.filter(file__icontains=file_name, is_main=False).exists():
+                #file_name = os.path.splitext(os.path.basename(photo))[0] + ".webp"
+                if not new_product.images.filter(file__icontains=photo, is_main=False).exists():
                     try:
                         image_path = f'shop/product/images/{photo}'
-                        image = process_image_to_webp(image_path)
+                        #image = process_image_to_webp(image_path)
                         ProductImage.objects.create(
                             product=new_product,
-                            file=image,
+                            file=image_path,
                             is_main=False
                         )
                     except:
@@ -325,6 +326,11 @@ def updateItems(file=None):
                     else:
                         avg_weight = (min_weight + max_weight) / 2
 
+                    size_obj.quantity = 0
+                    size_obj.price = 0
+                    size_obj.price_init = 0
+                    size_obj.price_opt = 0
+                    size_obj.price_opt_init = 0
 
                     size_obj.quantity += int(size.get('Quantity', 0))
                     size_obj.price = price
